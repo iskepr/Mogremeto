@@ -1,0 +1,33 @@
+name: mafuso
+description: "A new Flutter Game."
+publish_to: 'Skepr'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.0-24.0.dev
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.17
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/imgs/
+
+  fonts:
+    - family: foda
+      fonts:
+        - asset: assets/fonts/فودا.ttf
