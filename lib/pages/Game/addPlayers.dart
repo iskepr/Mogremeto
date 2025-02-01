@@ -27,6 +27,14 @@ class _AddPlayersState extends State<AddPlayers> {
     super.dispose();
   }
 
+  // دالة للتحقق من الحقول
+  bool validateFields() {
+    return player1.text.isNotEmpty &&
+        player2.text.isNotEmpty &&
+        player3.text.isNotEmpty &&
+        player4.text.isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,39 +43,62 @@ class _AddPlayersState extends State<AddPlayers> {
         width: double.infinity,
         child: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
-                flex: 1,
-                child: Center(
-                  child: Text(
-                    'ادخل اسماء اللاعبين',
-                    style: TextStyle(color: Color(0xFFFFF0CC), fontSize: 40),
-                  ),
+              Center(
+                child: Text(
+                  'ادخل اسماء اللاعبين',
+                  style: TextStyle(color: Color(0xFFFFF0CC), fontSize: 40),
                 ),
               ),
-              Expanded(
-                flex: 3,
-                child: Column(
-                  children: [
-                    Input(title: "اللاعب الاول", controller: player1),
-                    Input(title: "اللاعب الثاني", controller: player2),
-                    Input(title: "اللاعب الثالث", controller: player3),
-                    Input(title: "اللاعب الرابع", controller: player4),
-                  ],
-                ),
+
+              Column(
+                children: [
+                  Input(title: "اللاعب الاول", controller: player1),
+                  Input(title: "اللاعب الثاني", controller: player2),
+                  Input(title: "اللاعب الثالث", controller: player3),
+                  Input(title: "اللاعب الرابع", controller: player4),
+                ],
               ),
-              Expanded(
-                flex: 1,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 30),
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 50),
                   child: Button(
                     title: 'أبدأ التحقيق',
-                     page:SetCharacter(
-                                player1: player1.text,
-                                player2: player2.text,
-                                player3: player3.text,
-                                player4: player4.text,
-                              ), 
+                    onTap: () {
+                      // التحقق من الحقول
+                      if (validateFields()) {
+                        // الانتقال إلى صفحة SetCharacter إذا كانت الحقول صالحة
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => SetCharacter(
+                                  player1: player1.text,
+                                  player2: player2.text,
+                                  player3: player3.text,
+                                  player4: player4.text,
+                                ),
+                          ),
+                        );
+                      } else {
+                        // إظهار رسالة تحذير إذا كانت الحقول فارغة
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Color(0xFFFFF0CC),
+                            content: Text(
+                              'يرجى إدخال أسماء جميع اللاعبين',
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                color: Color(0xFF228272),
+                                fontSize: 25,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ),
               ),

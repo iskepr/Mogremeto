@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mafuso/data/stories.dart';
+import 'package:mafuso/pages/Game/dalel.dart';
 import 'package:mafuso/widgets/Card.dart';
 import 'package:mafuso/widgets/button.dart';
 
-class SetCharacter extends StatelessWidget {
+class SetCharacter extends StatefulWidget {
   const SetCharacter({
     super.key,
     required this.player1,
@@ -10,14 +12,69 @@ class SetCharacter extends StatelessWidget {
     required this.player3,
     required this.player4,
   });
+
   final String player1;
   final String player2;
   final String player3;
   final String player4;
 
   @override
+  State<SetCharacter> createState() => _SetCharacterState();
+}
+
+class _SetCharacterState extends State<SetCharacter> {
+  final Stories storiesInstance = Stories();
+  int playerId = 0;
+  int storyId = 0;
+  bool flip = false; // <-- متغير للتحكم في قلب الكارت
+
+  late String player;
+  late String type;
+  late bool isMasfuso;
+
+  @override
+  void initState() {
+    super.initState();
+    _updatePlayerData();
+  }
+
+  void _updatePlayerData() {
+    setState(() {
+      switch (playerId) {
+        case 0:
+          player = widget.player1;
+          break;
+        case 1:
+          player = widget.player2;
+          break;
+        case 2:
+          player = widget.player3;
+          break;
+        case 3:
+          player = widget.player4;
+          break;
+      }
+      type = storiesInstance.stories[storyId]['accused'][playerId]['type'];
+      isMasfuso =
+          storiesInstance.stories[storyId]['accused'][playerId]['criminal'];
+      flip = false; // <-- عند تغيير اللاعب، نعيد الكارت إلى الوضع الأول
+    });
+  }
+
+  void handle() {
+    if (playerId == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Dalel(storyId: storyId)),
+      );
+    } else {
+      playerId++;
+      _updatePlayerData();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String player = player1;
     return Scaffold(
       backgroundColor: Color(0xFFFFF0CC),
       body: Center(
@@ -28,15 +85,19 @@ class SetCharacter extends StatelessWidget {
               'ادي التليفون ل$player',
               style: TextStyle(color: Color(0xFF228272), fontSize: 40),
             ),
-            MafusoCard(character: 'ظابط (مافيوسو)'),
-            Button(
-              title: 'التالي',
-              page: SetCharacter(
-                player1: player1,
-                player2: player2,
-                player3: player3,
-                player4: player4,
-              ),
+            MafusoCard(
+              title: 'المهنة',
+              subtitle: '$type\n${isMasfuso ? '(مافيوسو)' : ''}',
+              flip: flip, // <-- تمرير حالة القلب إلى الكارت
+              onFlip: () {
+                setState(() {
+                  flip = !flip; // <-- عندما ينقلب الكارت، يتم تحديث حالته
+                });
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50),
+              child: Button(title: 'التالي', onTap: handle),
             ),
           ],
         ),

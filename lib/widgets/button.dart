@@ -2,25 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Button extends StatelessWidget {
-  const Button({super.key, required this.title, required this.page,});
+  const Button({super.key, required this.title, required this.onTap});
   final String title;
-  final Widget page;
-  
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => page));
-      },
+      onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Color(0xFFFFF0CC),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Color(0xFF822222)),
         ),
-        width: 300,
-        height: 70,
         margin: EdgeInsets.symmetric(vertical: 5),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5),
@@ -39,7 +34,7 @@ class Button extends StatelessWidget {
               Center(
                 child: Text(
                   title,
-                  style: TextStyle(color: Color(0xFF822222), fontSize: 40),
+                  style: TextStyle(color: Color(0xFF822222), fontSize: 35),
                 ),
               ),
             ],

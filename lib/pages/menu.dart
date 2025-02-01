@@ -38,12 +38,43 @@ class _MenuState extends State<Menu> {
                     child: SvgPicture.asset('assets/imgs/logo.svg', width: 250),
                   ),
                   Expanded(
-                    child: Column(
-                      children: [
-                        Button(title: 'قضية جديدة', page: AddPlayers()),
-                        Button(title: 'القضايا', page: Issues()),
-                        Button(title: 'الاعدادات', page: Settings()),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 50),
+                      child: Column(
+                        children: [
+                          Button(
+                            title: 'قضية جديدة',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddPlayers(),
+                                ),
+                              );
+                            },
+                          ),
+                          Button(
+                            title: 'القضايا',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => Issues()),
+                              );
+                            },
+                          ),
+                          Button(
+                            title: 'الاعدادات',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Settings(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(height: 150),
