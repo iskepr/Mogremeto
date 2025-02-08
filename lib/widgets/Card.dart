@@ -94,6 +94,7 @@ class _MafusoCardState extends State<MafusoCard> {
                             ),
                             Text(
                               widget.subtitle,
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Color(0xFF822222),
                                 fontSize: 30,

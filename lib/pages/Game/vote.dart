@@ -1,12 +1,21 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:mafuso/data/stories.dart';
 import 'package:mafuso/pages/Game/dalel.dart';
+import 'package:mafuso/pages/Game/doneGame.dart';
 import 'package:mafuso/widgets/button.dart';
 
 class Vote extends StatefulWidget {
-  const Vote({super.key, required this.storyId, required this.dalelId});
+  const Vote({
+    super.key,
+    required this.storyId,
+    required this.dalelId,
+    required this.outUsers,
+  });
+
   final int storyId;
   final int dalelId;
+  final List outUsers;
 
   @override
   State<Vote> createState() => _VoteState();
@@ -14,22 +23,15 @@ class Vote extends StatefulWidget {
 
 class _VoteState extends State<Vote> {
   final Stories storiesInstance = Stories();
-  late int storyId;
-  late int dalelId;
-  late String player1;
-  late String player2;
-  late String player3;
-  late String player4;
+  late List<Map<String, dynamic>> accused;
 
   @override
   void initState() {
     super.initState();
-    storyId = widget.storyId;
-    dalelId = widget.dalelId;
-    player1 = storiesInstance.stories[storyId]['accused'][0]['type'];
-    player2 = storiesInstance.stories[storyId]['accused'][1]['type'];
-    player3 = storiesInstance.stories[storyId]['accused'][2]['type'];
-    player4 = storiesInstance.stories[storyId]['accused'][3]['type'];
+    accused = List.generate(
+      4,
+      (i) => storiesInstance.stories[widget.storyId]['accused'][i],
+    );
   }
 
   @override
@@ -47,28 +49,61 @@ class _VoteState extends State<Vote> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
-                children: [
-                  Button(title: player1, onTap: () {}),
-                  Button(title: player2, onTap: () {}),
-                  Button(title: player3, onTap: () {}),
-                  Button(title: player4, onTap: () {}),
-                ],
+                children:
+                    accused
+                        .where(
+                          (player) => !widget.outUsers.contains(player['type']),
+                        )
+                        .map(
+                          (player) => Button(
+                            title: player['type'],
+                            onTap: () {
+                              widget.dalelId == 2 && !player['criminal']
+                                  ? Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => DoneGame(
+                                            storyId: widget.storyId,
+                                            inTitle:
+                                                'المُجرميتو كسب\nمعلش تعيشو وتاخدو غيرها',
+                                            butTitle: "المُجرميتو فلت", soundName: 'faild',
+                                          ),
+                                    ),
+                                  )
+                                  : Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              player['criminal']
+                                                  ? DoneGame(
+                                                    storyId: widget.storyId,
+                                                    inTitle:
+                                                        "الف مبروج قبضطم علي المجرميتو",
+                                                    butTitle: "تم حل القضية", soundName: 'intro',
+                                                  )
+                                                  : Dalel(
+                                                    storyId: widget.storyId,
+                                                    inTitle: 'بَريء',
+                                                    dalelId: widget.dalelId + 1,
+                                                    outUsers: [
+                                                      player['type'],
+                                                      ...widget.outUsers,
+                                                    ],
+                                                  ),
+                                    ),
+                                  );
+                              AudioPlayer().play(
+                                UrlSource('assets/sounds/click.mp3'),
+                              );
+                            },
+                          ),
+                        )
+                        .toList(),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50),
-              child: Button(
-                title: 'الدليل التالي',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Dalel(storyId: storyId),
-                    ),
-                  );
-                },
-              ),
-            ),
+            SizedBox(height: 90),
           ],
         ),
       ),

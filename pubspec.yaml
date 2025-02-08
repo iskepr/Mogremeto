@@ -12,6 +12,8 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.17
+  shared_preferences: ^2.5.1
+  audioplayers: ^6.1.1
 
 dev_dependencies:
   flutter_test:
@@ -26,6 +28,7 @@ flutter:
 
   assets:
     - assets/imgs/
+    - assets/sounds/
 
   fonts:
     - family: foda

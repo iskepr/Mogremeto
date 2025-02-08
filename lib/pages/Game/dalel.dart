@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:mafuso/data/stories.dart';
 import 'package:mafuso/pages/Game/vote.dart';
@@ -7,8 +8,17 @@ import 'package:mafuso/widgets/Card.dart';
 import 'package:mafuso/widgets/button.dart';
 
 class Dalel extends StatefulWidget {
-  const Dalel({super.key, required this.storyId});
+  const Dalel({
+    super.key,
+    required this.storyId,
+    required this.inTitle,
+    required this.dalelId,
+    required this.outUsers,
+  });
   final int storyId;
+  final int dalelId;
+  final String inTitle;
+  final List outUsers;
 
   @override
   State<Dalel> createState() => _DalelState();
@@ -17,20 +27,30 @@ class Dalel extends StatefulWidget {
 class _DalelState extends State<Dalel> {
   final Stories storiesInstance = Stories();
   late int storyId;
-  int dalelId = 0;
   late String dalelTitle;
   bool isFlip = false;
   bool showCard = true;
   double cardOpacity = 0;
+  String dalelNum = '';
 
   @override
   void initState() {
     super.initState();
     storyId = widget.storyId;
-    dalelTitle = storiesInstance.stories[storyId]['evidence'][dalelId];
+    dalelTitle = storiesInstance.stories[storyId]['evidence'][widget.dalelId];
+
+    if (widget.dalelId == 0) {
+      dalelNum = 'الدليل الاول';
+    } else if (widget.dalelId == 1) {
+      dalelNum = 'الدليل الثاني';
+    } else if (widget.dalelId == 2) {
+      dalelNum = 'الدليل الثالث';
+    }
+
     Timer(const Duration(milliseconds: 500), () {
       setState(() {
         cardOpacity = 1;
+        AudioPlayer().play(UrlSource('assets/sounds/intro.mp3'));
       });
       Timer(const Duration(seconds: 5), () {
         setState(() {
@@ -45,6 +65,7 @@ class _DalelState extends State<Dalel> {
             setState(() {
               cardOpacity = 1;
               isFlip = true;
+              AudioPlayer().play(UrlSource('assets/sounds/flipcard.mp3'));
             });
           });
         });
@@ -72,7 +93,8 @@ class _DalelState extends State<Dalel> {
                     height: 280,
                     child: Center(
                       child: Text(
-                        'الجريمة هي\n${storiesInstance.stories[storyId]['title']}',
+                        widget.inTitle,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Color(0xFFFFF0CC),
                           fontSize: 60,
@@ -85,7 +107,7 @@ class _DalelState extends State<Dalel> {
                   opacity: cardOpacity,
                   duration: Duration(seconds: 1),
                   child: MafusoCard(
-                    title: 'الدليل الاول',
+                    title: dalelNum,
                     subtitle: dalelTitle,
                     flip: isFlip,
                     onFlip: () {},
@@ -100,7 +122,7 @@ class _DalelState extends State<Dalel> {
                         opacity: cardOpacity,
                         duration: Duration(seconds: 1),
                         child: Button(
-                          title: 'إالي التصويت',
+                          title: 'إلي التصويت',
                           onTap: () {
                             Navigator.push(
                               context,
@@ -108,10 +130,12 @@ class _DalelState extends State<Dalel> {
                                 builder:
                                     (context) => Vote(
                                       storyId: storyId,
-                                      dalelId: dalelId,
+                                      dalelId: widget.dalelId,
+                                      outUsers: widget.outUsers,
                                     ),
                               ),
                             );
+                            print(widget.outUsers);
                           },
                         ),
                       ),

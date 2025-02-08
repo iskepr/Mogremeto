@@ -1,8 +1,8 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mafuso/pages/Game/addPlayers.dart';
 import 'package:mafuso/pages/issues.dart';
-import 'package:mafuso/pages/settings.dart';
 import 'package:mafuso/widgets/button.dart';
 
 class Menu extends StatefulWidget {
@@ -45,6 +45,9 @@ class _MenuState extends State<Menu> {
                           Button(
                             title: 'قضية جديدة',
                             onTap: () {
+                              AudioPlayer().play(
+                                UrlSource('assets/sounds/click.mp3'),
+                              );
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -56,19 +59,13 @@ class _MenuState extends State<Menu> {
                           Button(
                             title: 'القضايا',
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => Issues()),
+                              AudioPlayer().play(
+                                UrlSource('assets/sounds/click.mp3'),
                               );
-                            },
-                          ),
-                          Button(
-                            title: 'الاعدادات',
-                            onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => Settings(),
+                                  builder: (context) => Issues(),
                                 ),
                               );
                             },
