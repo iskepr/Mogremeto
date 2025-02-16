@@ -3,6 +3,7 @@ class Stories {
     {
       "id": 1,
       "title": "سرقة خزنة",
+      "type": "سرقة",
       "accused": [
         {"type": "مُحاسب", "criminal": false},
         {"type": "مُهندس ديكور", "criminal": false},
@@ -20,9 +21,31 @@ class Stories {
       "source": "",
       "solved": false,
     },
+    
     {
       "id": 2,
-      "title": "اختفاء اللوحة الفنية",
+      "title": "تزوير وثائق",
+      "type": "تزوير",
+      "accused": [
+        {"type": "موظف حكومي", "criminal": true},
+        {"type": "مراجع حسابات", "criminal": false},
+        {"type": "مواطن", "criminal": false},
+        {"type": "محامٍ", "criminal": false},
+      ],
+      "evidence": [
+        "اكتشاف وثائق مزورة",
+        "دافع الجريمة كان الرشوة",
+        "المجرم كان بيستغل منصبه",
+      ],
+      "story":
+          "الموظف الحكومي كان بيزور وثائق رسمية مقابل رشاوي من الناس اللي محتاجة الأوراق دي.",
+      "real": false,
+      "source": "",
+      "solved": false,
+    },{
+      "id": 3,
+      "title": "اختفاء لوحة الفنية",
+      "type": "سرقة",
       "accused": [
         {"type": "حارس أمن", "criminal": false},
         {"type": "فنان تشكيلي", "criminal": true},
@@ -41,21 +64,21 @@ class Stories {
       "solved": false,
     },
     {
-      "id": 3,
-      "title": "تزوير الوثائق",
+      "id": 4,
+      "title": "اختراق دكتور جامعي",
+      "type": "اختراق",
       "accused": [
-        {"type": "موظف حكومي", "criminal": true},
-        {"type": "مراجع حسابات", "criminal": false},
-        {"type": "مواطن", "criminal": false},
-        {"type": "محامٍ", "criminal": false},
+        {"type": "زوجة الدكتور", "criminal": false},
+        {"type": "مساعد الدكتور", "criminal": false},
+        {"type": "طالب", "criminal": true},
+        {"type": "صديق الدكتور", "criminal": false},
       ],
       "evidence": [
-        "اكتشاف وثائق مزورة",
-        "دافع الجريمة كان الرشوة",
-        "المجرم كان بيستغل منصبه",
+        "الدكتور حس انه مراقب",
+        "دافع الاختراق كان الانتقام",
+        "الدكتور كان عصبي",
       ],
-      "story":
-          "الموظف الحكومي كان بيزور وثائق رسمية مقابل رشاوي من الناس اللي محتاجة الأوراق دي.",
+      "story": "الدكتور كان عصبي جدا وبيسقط نص الدفعة كل سنة فا طالب عنده اخترق جهازه واكتشف ان الشهادات بتاعت الدكتور مذوره",
       "real": false,
       "source": "",
       "solved": false,

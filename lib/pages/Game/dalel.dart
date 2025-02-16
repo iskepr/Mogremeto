@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mafuso/data/stories.dart';
 import 'package:mafuso/pages/Game/vote.dart';
@@ -50,8 +51,12 @@ class _DalelState extends State<Dalel> {
     Timer(const Duration(milliseconds: 500), () {
       setState(() {
         cardOpacity = 1;
-        AudioPlayer().play(UrlSource('assets/sounds/intro.mp3'));
       });
+      if (kIsWeb) {
+        AudioPlayer().play(UrlSource('assets/sounds/intro.mp3'));
+      } else {
+        AudioPlayer().play(AssetSource('sounds/intro.mp3'));
+      }
       Timer(const Duration(seconds: 5), () {
         setState(() {
           cardOpacity = 0;
@@ -65,8 +70,12 @@ class _DalelState extends State<Dalel> {
             setState(() {
               cardOpacity = 1;
               isFlip = true;
-              AudioPlayer().play(UrlSource('assets/sounds/flipcard.mp3'));
             });
+            if (kIsWeb) {
+              AudioPlayer().play(UrlSource('assets/sounds/flipcard.mp3'));
+            } else {
+              AudioPlayer().play(AssetSource('sounds/flipcard.mp3'));
+            }
           });
         });
       });

@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mafuso/data/stories.dart';
 import 'package:mafuso/pages/Game/dalel.dart';
@@ -102,11 +103,17 @@ class _SetCharacterState extends State<SetCharacter> {
               title: 'المهنة',
               subtitle: '$type\n${isMasfuso ? '(مافيوسو)' : ''}',
               flip: flip, // <-- تمرير حالة القلب إلى الكارت
-              onFlip: () {
+              onFlip: () async {
                 setState(() {
                   flip = !flip; // <-- عندما ينقلب الكارت، يتم تحديث حالته
                 });
-                AudioPlayer().play(UrlSource('assets/sounds/flipcard.mp3'));
+                if (kIsWeb) {
+                  await AudioPlayer().play(
+                    UrlSource('assets/sounds/flipcard.mp3'),
+                  );
+                } else {
+                  await AudioPlayer().play(AssetSource('sounds/flipcard.mp3'));
+                }
               },
             ),
             Padding(

@@ -92,7 +92,7 @@ class _SplashState extends State<Splash> {
                 Column(
                   children: [
                     Text(
-                      'بواسطة',
+                      'برمجة',
                       style: TextStyle(color: Color(0xFF228272), fontSize: 20),
                     ),
                     Text(

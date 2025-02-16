@@ -1,12 +1,15 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mafuso/data/stories.dart';
 import 'package:mafuso/main.dart';
+import 'package:mafuso/models/adModel.dart';
 import 'package:mafuso/widgets/button.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class DoneGame extends StatefulWidget {
   const DoneGame({
@@ -36,8 +39,12 @@ class _DoneGameState extends State<DoneGame> {
     Timer(const Duration(milliseconds: 500), () {
       setState(() {
         cardOpacity = 1;
-        AudioPlayer().play(UrlSource('assets/sounds/${widget.soundName}.mp3'));
       });
+      if (kIsWeb) {
+        AudioPlayer().play(UrlSource('assets/sounds/${widget.soundName}.mp3'));
+      } else {
+        AudioPlayer().play(AssetSource('sounds/${widget.soundName}.mp3'));
+      }
       Timer(const Duration(seconds: 5), () {
         setState(() {
           cardOpacity = 0;
@@ -74,6 +81,24 @@ class _DoneGameState extends State<DoneGame> {
     // حفظ القائمة المحدثة
     await prefs.setStringList('doneStories', doneStories);
     print(prefs.getStringList('doneStories'));
+  }
+
+  RewardedAd? _rewardedAd;
+
+  void loadAd() {
+    RewardedAd.load(
+      adUnitId: AdModel.adUnitawardId,
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          debugPrint('$ad loaded.');
+          _rewardedAd = ad;
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          debugPrint('RewardedAd failed to load: $error');
+        },
+      ),
+    );
   }
 
   @override
@@ -124,10 +149,28 @@ class _DoneGameState extends State<DoneGame> {
                 title: widget.butTitle,
                 onTap: () {
                   saveData();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Mafuso()),
-                  );
+                  if (_rewardedAd != null) {
+                    _rewardedAd!.show(
+                      onUserEarnedReward: (
+                        AdWithoutView ad,
+                        RewardItem reward,
+                      ) {
+                        debugPrint(
+                          'User earned reward: ${reward.amount} ${reward.type}',
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Mafuso()),
+                        );
+                      },
+                    );
+                  } else {
+                    debugPrint('Ad not loaded yet. Loading now...');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Mafuso()),
+                    );
+                  }
                 },
               ),
             ),

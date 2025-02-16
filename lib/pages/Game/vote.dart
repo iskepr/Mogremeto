@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mafuso/data/stories.dart';
 import 'package:mafuso/pages/Game/dalel.dart';
@@ -57,7 +58,7 @@ class _VoteState extends State<Vote> {
                         .map(
                           (player) => Button(
                             title: player['type'],
-                            onTap: () {
+                            onTap: () async {
                               widget.dalelId == 2 && !player['criminal']
                                   ? Navigator.push(
                                     context,
@@ -67,7 +68,8 @@ class _VoteState extends State<Vote> {
                                             storyId: widget.storyId,
                                             inTitle:
                                                 'المُجرميتو كسب\nمعلش تعيشو وتاخدو غيرها',
-                                            butTitle: "المُجرميتو فلت", soundName: 'faild',
+                                            butTitle: "المُجرميتو فلت",
+                                            soundName: 'faild',
                                           ),
                                     ),
                                   )
@@ -81,7 +83,8 @@ class _VoteState extends State<Vote> {
                                                     storyId: widget.storyId,
                                                     inTitle:
                                                         "الف مبروج قبضطم علي المجرميتو",
-                                                    butTitle: "تم حل القضية", soundName: 'intro',
+                                                    butTitle: "تم حل القضية",
+                                                    soundName: 'intro',
                                                   )
                                                   : Dalel(
                                                     storyId: widget.storyId,
@@ -94,9 +97,15 @@ class _VoteState extends State<Vote> {
                                                   ),
                                     ),
                                   );
-                              AudioPlayer().play(
-                                UrlSource('assets/sounds/click.mp3'),
-                              );
+                              if (kIsWeb) {
+                                await AudioPlayer().play(
+                                  UrlSource('assets/sounds/click.mp3'),
+                                );
+                              } else {
+                                await AudioPlayer().play(
+                                  AssetSource('sounds/click.mp3'),
+                                );
+                              }
                             },
                           ),
                         )

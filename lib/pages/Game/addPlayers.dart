@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mafuso/data/stories.dart';
 import 'package:mafuso/pages/Game/setCharacter.dart';
@@ -24,7 +25,7 @@ class _AddPlayersState extends State<AddPlayers> {
   final player4 = TextEditingController();
   final Stories storiesInstance = Stories();
 
-  late int storyId;
+  int storyId = -1;
 
   @override
   void dispose() {
@@ -71,7 +72,7 @@ class _AddPlayersState extends State<AddPlayers> {
         storyId = -1;
       });
     }
-    print(doneStories);
+    print("-------------------------------------------------------------------------------$doneStories");
   }
 
   @override
@@ -135,10 +136,16 @@ class _AddPlayersState extends State<AddPlayers> {
                           padding: const EdgeInsets.symmetric(horizontal: 50),
                           child: Button(
                             title: 'أبدأ التحقيق',
-                            onTap: () {
-                              AudioPlayer().play(
-                                UrlSource('assets/sounds/click.mp3'),
-                              );
+                            onTap: () async {
+                              if (kIsWeb) {
+                                await AudioPlayer().play(
+                                  UrlSource('assets/sounds/click.mp3'),
+                                );
+                              } else {
+                                await AudioPlayer().play(
+                                  AssetSource('sounds/click.mp3'),
+                                );
+                              }
                               // التحقق من الحقول
                               if (validateFields()) {
                                 // الانتقال إلى صفحة SetCharacter إذا كانت الحقول صالحة
@@ -180,5 +187,11 @@ class _AddPlayersState extends State<AddPlayers> {
         ),
       ),
     );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(IntProperty('storyId', storyId));
   }
 }
