@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:mafuso/data/stories.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Issues extends StatefulWidget {
@@ -11,7 +12,7 @@ class Issues extends StatefulWidget {
 }
 
 class _IssuesState extends State<Issues> {
-  final Stories storiesInstance = Stories();
+  late List<Map<String, dynamic>> storiesInstance = [];
   List<String> issues = [];
   List<int> availableIds = [];
   List<int> usedIds = [];
@@ -19,11 +20,25 @@ class _IssuesState extends State<Issues> {
   @override
   void initState() {
     super.initState();
-    getStoryId();
+    loadStories();
+  }
 
-    issues = storiesInstance.stories
-        .map<String>((story) => story["type"].toString())
-        .toList();
+  Future<void> loadStories() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? storedStories = prefs.getString('localStories');
+
+    if (storedStories != null) {
+      setState(() {
+        storiesInstance = List<Map<String, dynamic>>.from(
+          jsonDecode(storedStories),
+        );
+        issues =
+            storiesInstance
+                .map<String>((story) => story["type"].toString())
+                .toList();
+      });
+      getStoryId();
+    }
   }
 
   Future<void> getStoryId() async {
@@ -33,9 +48,11 @@ class _IssuesState extends State<Issues> {
     List<int> savedIds = doneStories?.map(int.parse).toList() ?? [];
     setState(() {
       usedIds = savedIds;
-      availableIds = List.generate(storiesInstance.stories.length, (index) => index)
-          .where((id) => !savedIds.contains(id))
-          .toList();
+      availableIds =
+          List.generate(
+            storiesInstance.length,
+            (index) => index,
+          ).where((id) => !savedIds.contains(id)).toList();
     });
 
     print("المحفوظة: $usedIds");
@@ -52,7 +69,10 @@ class _IssuesState extends State<Issues> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start, // لجعل العنوان بالأعلى
             children: [
-              const Text('جميع القضايا', style: TextStyle(fontSize: 40, color: Color(0xFFFFF0CC))),
+              const Text(
+                'جميع القضايا',
+                style: TextStyle(fontSize: 40, color: Color(0xFFFFF0CC)),
+              ),
               const SizedBox(height: 20),
               Expanded(
                 child: SingleChildScrollView(
@@ -61,7 +81,9 @@ class _IssuesState extends State<Issues> {
                     runSpacing: 10,
                     children: List.generate(issues.length, (index) {
                       String issue = issues[index];
-                      bool isSaved = usedIds.contains(index); // التحقق مما إذا كان العنصر محفوظًا
+                      bool isSaved = usedIds.contains(
+                        index,
+                      ); // التحقق مما إذا كان العنصر محفوظًا
 
                       return Container(
                         decoration: BoxDecoration(
@@ -94,7 +116,10 @@ class _IssuesState extends State<Issues> {
                                 issue,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: isSaved ? const Color(0xFF822222) : const Color(0xFF228272),
+                                  color:
+                                      isSaved
+                                          ? const Color(0xFF822222)
+                                          : const Color(0xFF228272),
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),

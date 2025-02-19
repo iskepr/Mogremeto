@@ -1,13 +1,21 @@
+import 'dart:convert';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:mafuso/pages/Game/addPlayers.dart';
-import 'package:mafuso/pages/issues.dart';
-import 'package:mafuso/widgets/button.dart';
-import 'package:mafuso/models/adModel.dart';
+import 'package:mogremeto/data/stories.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../pages/Game/addPlayers.dart';
+import '../pages/issues.dart';
+import '../widgets/button.dart';
+import '../models/adModel.dart';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 class Menu extends StatefulWidget {
   const Menu({super.key});
@@ -17,6 +25,7 @@ class Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<Menu> {
+  // ----- الاعلان
   RewardedAd? _rewardedAd;
 
   void loadAd() {
@@ -34,6 +43,145 @@ class _MenuState extends State<Menu> {
       ),
     );
   }
+
+  @override
+  void initState() {
+    super.initState();
+    getStories();
+    checkForUpdate();
+  }
+
+  // ----- تحديث القصص
+  final supabase = Supabase.instance.client;
+  final localStories = Stories().stories;
+  Future<void> getStories() async {
+    final stories = await Supabase.instance.client.from('stories').select();
+
+    print("🔍 البيانات القادمة من Supabase:");
+    print(stories); // ✅ طباعة البيانات بالكامل
+
+    final prefs = await SharedPreferences.getInstance();
+    final String? storedStoriesJson = prefs.getString('localStories');
+
+    List<dynamic> localStories =
+        storedStoriesJson != null ? jsonDecode(storedStoriesJson) : [];
+
+    for (var story in stories) {
+      final storyData = story['story']; // ✅ استخراج القصة من داخل المفتاح story
+      if (storyData == null) {
+        print("⚠️ القصة غير موجودة داخل كائن story!");
+        continue;
+      }
+
+      final storyId = storyData['id'];
+      final storyContent = storyData['story'];
+
+      if (storyId == null || storyContent == null) {
+        print("⚠️ القصة مفقود فيها ID أو Story!");
+        continue;
+      }
+
+      bool alreadyExists = localStories.any((s) => s['id'] == storyId);
+
+      if (!alreadyExists) {
+        localStories.add({
+          'id': storyId,
+          'story': storyContent,
+          'title': storyData['title'] ?? 'بدون عنوان',
+          'type': storyData['type'] ?? 'غير معروف',
+          'evidence': storyData['evidence'] ?? [],
+          'accused': storyData['accused'] ?? [],
+        });
+      }
+    }
+
+    await prefs.setString('localStories', jsonEncode(localStories));
+
+    print("✅ تم تحديث القصص المخزنة محليًا.");
+    print("-----------------------------------------------------");
+    print("📌 القصص المخزنة محليًا:");
+
+    print("$storedStoriesJson");
+  }
+
+  // ----- تحديث التطبيق
+  Future<void> checkForUpdate() async {
+    // احصل على رقم إصدار التطبيق الحالي
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String currentVersion = packageInfo.version;
+
+    // احصل على آخر إصدار من GitHub
+    final response = await http.get(
+      Uri.parse(
+        'https://api.github.com/repos/iskepr/mogremeto/releases/latest',
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      String latestVersion = data['tag_name'].replaceFirst('v', '');
+      String downloadUrl = data['assets'][0]['browser_download_url'];
+
+      // قارن رقم الإصدار
+      if (_isNewVersionAvailable(currentVersion, latestVersion)) {
+        _showUpdateDialog(downloadUrl);
+      }
+    }
+  }
+
+  bool _isNewVersionAvailable(String current, String latest) {
+    List<int> currentParts = current.split('.').map(int.parse).toList();
+    List<int> latestParts = latest.split('.').map(int.parse).toList();
+    for (int i = 0; i < latestParts.length; i++) {
+      if (latestParts[i] > currentParts[i]) {
+        return true;
+      } else if (latestParts[i] < currentParts[i]) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  void _showUpdateDialog(String downloadUrl) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: Color(0xFFFFF0CC),
+            title: Text(
+              "!تحديث جديد متاح",
+              textAlign: TextAlign.right,
+              style: TextStyle(color: Color(0xFF822222)),
+            ),
+            content: Text(
+              ".يفضل تحديث اللعبة عشان احدث المميزات",
+              textAlign: TextAlign.right,
+              style: TextStyle(color: Color(0xFF822222)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  "لاحقًا",
+                  style: TextStyle(color: Color(0xFF822222)),
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  if (await canLaunch(downloadUrl)) {
+                    await launch(downloadUrl);
+                  }
+                },
+                child: Text(
+                  "تحديث الآن",
+                  style: TextStyle(color: Color(0xFF822222)),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

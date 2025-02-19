@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class MafusoCard extends StatefulWidget {
-  const MafusoCard({
+class mogremetoCard extends StatefulWidget {
+  const mogremetoCard({
     super.key,
     required this.title,
     required this.subtitle,
@@ -16,10 +16,10 @@ class MafusoCard extends StatefulWidget {
   final VoidCallback onFlip; // <-- دالة تُستدعى عند قلب الكارت
 
   @override
-  State<MafusoCard> createState() => _MafusoCardState();
+  State<mogremetoCard> createState() => _mogremetoCardState();
 }
 
-class _MafusoCardState extends State<MafusoCard> {
+class _mogremetoCardState extends State<mogremetoCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

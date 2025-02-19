@@ -21,7 +21,6 @@ class Stories {
       "source": "",
       "solved": false,
     },
-    
     {
       "id": 2,
       "title": "تزوير وثائق",
@@ -42,7 +41,8 @@ class Stories {
       "real": false,
       "source": "",
       "solved": false,
-    },{
+    },
+    {
       "id": 3,
       "title": "اختفاء لوحة الفنية",
       "type": "سرقة",

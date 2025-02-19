@@ -1,13 +1,13 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mafuso/data/stories.dart';
-import 'package:mafuso/pages/Game/setCharacter.dart';
-import 'package:mafuso/pages/menu.dart';
-import 'package:mafuso/widgets/button.dart';
-import 'package:mafuso/widgets/input.dart';
+import '../../pages/Game/setCharacter.dart';
+import '../../pages/menu.dart';
+import '../../widgets/button.dart';
+import '../../widgets/input.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddPlayers extends StatefulWidget {
@@ -23,13 +23,11 @@ class _AddPlayersState extends State<AddPlayers> {
   final player2 = TextEditingController();
   final player3 = TextEditingController();
   final player4 = TextEditingController();
-  final Stories storiesInstance = Stories();
-
+  late List<dynamic> storiesInstance = [];
   int storyId = -1;
 
   @override
   void dispose() {
-    // تنظيف المتحكمات عند التخلص من الويدجيت
     player1.dispose();
     player2.dispose();
     player3.dispose();
@@ -37,7 +35,6 @@ class _AddPlayersState extends State<AddPlayers> {
     super.dispose();
   }
 
-  // دالة للتحقق من الحقول
   bool validateFields() {
     return player1.text.isNotEmpty &&
         player2.text.isNotEmpty &&
@@ -48,31 +45,66 @@ class _AddPlayersState extends State<AddPlayers> {
   @override
   void initState() {
     super.initState();
-    getStoryId();
+    loadStories();
+  }
+
+  Future<void> loadStories() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? storedStories = prefs.getString('localStories');
+
+    if (storedStories != null) {
+      setState(() {
+        storiesInstance = jsonDecode(storedStories);
+      });
+
+      if (storiesInstance.isEmpty) {
+        setState(() {
+          storyId = -1;
+        });
+        return;
+      }
+
+      getStoryId();
+    }
   }
 
   Future<void> getStoryId() async {
     final prefs = await SharedPreferences.getInstance();
     List<String>? doneStories = prefs.getStringList('doneStories');
 
-    List<int> usedIds = doneStories?.map(int.parse).toList() ?? [];
-    List<int> availableIds =
-        List.generate(
-          storiesInstance.stories.length,
-          (index) => index,
-        ).where((id) => !usedIds.contains(id)).toList();
-
-    if (availableIds.isNotEmpty) {
-      int newStoryId = availableIds[Random().nextInt(availableIds.length)];
-      setState(() {
-        storyId = newStoryId;
-      });
-    } else {
+    // تأكد من أن storiesInstance ليس فارغًا
+    if (storiesInstance.isEmpty) {
+      print("Error: storiesInstance is empty!");
       setState(() {
         storyId = -1;
       });
+      return;
     }
-    print("-------------------------------------------------------------------------------$doneStories");
+
+    List<int> usedIds = doneStories?.map(int.parse).toList() ?? [];
+    List<int> availableIds =
+        List.generate(
+          storiesInstance.length,
+          (index) => index,
+        ).where((id) => !usedIds.contains(id)).toList();
+
+    print("Available IDs: $availableIds");
+
+    // تأكد من أن availableIds يحتوي على بيانات
+    if (availableIds.isEmpty) {
+      print("Error: No available story IDs!");
+      setState(() {
+        storyId = -1;
+      });
+      return;
+    }
+
+    int newStoryId = availableIds[Random().nextInt(availableIds.length)];
+    setState(() {
+      storyId = newStoryId;
+    });
+
+    print("Selected Story ID: $storyId");
   }
 
   @override

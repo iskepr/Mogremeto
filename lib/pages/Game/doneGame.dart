@@ -1,12 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mafuso/data/stories.dart';
-import 'package:mafuso/main.dart';
-import 'package:mafuso/models/adModel.dart';
-import 'package:mafuso/widgets/button.dart';
+import '../../main.dart';
+import '../../models/adModel.dart';
+import '../../widgets/button.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -29,13 +29,14 @@ class DoneGame extends StatefulWidget {
 }
 
 class _DoneGameState extends State<DoneGame> {
-  final Stories storiesInstance = Stories();
+  List<dynamic>? storiesInstance;
   bool showStory = false;
   double cardOpacity = 0;
 
   @override
   void initState() {
     super.initState();
+    loadStories();
     Timer(const Duration(milliseconds: 500), () {
       setState(() {
         cardOpacity = 1;
@@ -63,6 +64,19 @@ class _DoneGameState extends State<DoneGame> {
       });
     });
   }
+
+  Future<void> loadStories() async {
+  final prefs = await SharedPreferences.getInstance();
+  String? storedStories = prefs.getString('localStories');
+
+  if (storedStories != null) {
+    List<dynamic> decodedStories = jsonDecode(storedStories);
+    
+    setState(() {
+      storiesInstance = decodedStories;
+    });
+  }
+}
 
   Future<void> saveData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -120,7 +134,7 @@ class _DoneGameState extends State<DoneGame> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Text(
-                      storiesInstance.stories[widget.storyId]['story'],
+                      storiesInstance?[widget.storyId]['story'],
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Color(0xFF822222), fontSize: 35),
                     ),
@@ -160,7 +174,7 @@ class _DoneGameState extends State<DoneGame> {
                         );
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => Mafuso()),
+                          MaterialPageRoute(builder: (context) => mogremeto()),
                         );
                       },
                     );
@@ -168,7 +182,7 @@ class _DoneGameState extends State<DoneGame> {
                     debugPrint('Ad not loaded yet. Loading now...');
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Mafuso()),
+                      MaterialPageRoute(builder: (context) => mogremeto()),
                     );
                   }
                 },

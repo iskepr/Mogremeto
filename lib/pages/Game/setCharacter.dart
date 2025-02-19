@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mafuso/data/stories.dart';
-import 'package:mafuso/pages/Game/dalel.dart';
-import 'package:mafuso/widgets/Card.dart';
-import 'package:mafuso/widgets/button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../pages/Game/dalel.dart';
+import '../../widgets/Card.dart';
+import '../../widgets/button.dart';
 
 class SetCharacter extends StatefulWidget {
   const SetCharacter({
@@ -27,24 +29,54 @@ class SetCharacter extends StatefulWidget {
 }
 
 class _SetCharacterState extends State<SetCharacter> {
-  final Stories storiesInstance = Stories();
+  List<dynamic>? storiesInstance;
   int playerId = 0;
   bool flip = false;
 
   late int storyId;
   late String player;
   late String type;
-  late bool isMasfuso;
+  late bool isMogrem;
 
   @override
   void initState() {
     super.initState();
     storyId = widget.storyId;
     _updatePlayerData();
+    loadStories();
+  }
+
+  Future<void> loadStories() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? storedStories = prefs.getString('localStories');
+
+    if (storedStories != null) {
+      List<dynamic> decodedStories = jsonDecode(storedStories);
+      setState(() {
+        storiesInstance = decodedStories;
+      });
+
+      if (decodedStories.isEmpty) {
+        setState(() {
+          storyId = -1;
+        });
+      } else {
+        // تأكد من تحديث بيانات اللاعب بعد تحميل القصص
+        _updatePlayerData();
+      }
+    }
   }
 
   void _updatePlayerData() {
+    if (storiesInstance == null ||
+        storyId == -1 ||
+        storyId >= (storiesInstance?.length ?? 0)) {
+      return;
+    }
+
     setState(() {
+      print("Updating player data for playerId: $playerId");
+
       switch (playerId) {
         case 0:
           player = widget.player1;
@@ -58,15 +90,29 @@ class _SetCharacterState extends State<SetCharacter> {
         case 3:
           player = widget.player4;
           break;
+        default:
+          player = 'غير معروف';
+          return;
       }
-      type = storiesInstance.stories[storyId]['accused'][playerId]['type'];
-      isMasfuso =
-          storiesInstance.stories[storyId]['accused'][playerId]['criminal'];
+
+      var currentStory = storiesInstance![storyId];
+
+      if (currentStory.containsKey('accused') &&
+          playerId < currentStory['accused'].length) {
+        type = currentStory['accused'][playerId]['type'] ?? 'غير معروف';
+        isMogrem = currentStory['accused'][playerId]['criminal'] ?? false;
+      } else {
+        type = 'غير معروف';
+        isMogrem = false;
+      }
+
       flip = false;
     });
   }
 
   void handle() {
+    if (storiesInstance == null || storyId == -1) return;
+
     if (playerId == 3) {
       Navigator.push(
         context,
@@ -74,16 +120,17 @@ class _SetCharacterState extends State<SetCharacter> {
           builder:
               (context) => Dalel(
                 storyId: storyId,
-                inTitle:
-                    'الجريمة هي\n${storiesInstance.stories[storyId]['title']}',
+                inTitle: 'الجريمة هي\n${storiesInstance![storyId]['title']}',
                 dalelId: 0,
                 outUsers: [],
               ),
         ),
       );
     } else {
-      playerId++;
-      _updatePlayerData();
+      setState(() {
+        playerId++;
+        _updatePlayerData();
+      });
     }
   }
 
@@ -99,9 +146,9 @@ class _SetCharacterState extends State<SetCharacter> {
               'ادي التليفون ل$player',
               style: TextStyle(color: Color(0xFF228272), fontSize: 40),
             ),
-            MafusoCard(
+            mogremetoCard(
               title: 'المهنة',
-              subtitle: '$type\n${isMasfuso ? '(مافيوسو)' : ''}',
+              subtitle: '$type\n${isMogrem ? '(مُجرميتو)' : ''}',
               flip: flip, // <-- تمرير حالة القلب إلى الكارت
               onFlip: () async {
                 setState(() {

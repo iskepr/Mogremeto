@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mafuso/data/stories.dart';
-import 'package:mafuso/pages/Game/vote.dart';
-import 'package:mafuso/widgets/Card.dart';
-import 'package:mafuso/widgets/button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../pages/Game/vote.dart';
+import '../../widgets/Card.dart';
+import '../../widgets/button.dart';
 
 class Dalel extends StatefulWidget {
   const Dalel({
@@ -26,7 +27,7 @@ class Dalel extends StatefulWidget {
 }
 
 class _DalelState extends State<Dalel> {
-  final Stories storiesInstance = Stories();
+  List<dynamic>? storiesInstance;
   late int storyId;
   late String dalelTitle;
   bool isFlip = false;
@@ -38,14 +39,21 @@ class _DalelState extends State<Dalel> {
   void initState() {
     super.initState();
     storyId = widget.storyId;
-    dalelTitle = storiesInstance.stories[storyId]['evidence'][widget.dalelId];
+    loadStories();
 
-    if (widget.dalelId == 0) {
-      dalelNum = 'الدليل الاول';
-    } else if (widget.dalelId == 1) {
-      dalelNum = 'الدليل الثاني';
-    } else if (widget.dalelId == 2) {
-      dalelNum = 'الدليل الثالث';
+    // تعيين dalelNum بناءً على dalelId
+    switch (widget.dalelId) {
+      case 0:
+        dalelNum = 'الدليل الأول';
+        break;
+      case 1:
+        dalelNum = 'الدليل الثاني';
+        break;
+      case 2:
+        dalelNum = 'الدليل الثالث';
+        break;
+      default:
+        dalelNum = 'دليل غير معروف';
     }
 
     Timer(const Duration(milliseconds: 500), () {
@@ -82,6 +90,27 @@ class _DalelState extends State<Dalel> {
     });
   }
 
+  Future<void> loadStories() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? storedStories = prefs.getString('localStories');
+
+    if (storedStories != null) {
+      List<dynamic> decodedStories = jsonDecode(storedStories);
+      setState(() {
+        storiesInstance = decodedStories;
+
+        // تحديث dalelTitle فقط بعد تحميل البيانات
+        if (storyId >= 0 && storyId < storiesInstance!.length) {
+          dalelTitle =
+              storiesInstance![storyId]['evidence'][widget.dalelId] ??
+              'دليل غير معروف';
+        } else {
+          dalelTitle = 'دليل غير معروف';
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,7 +144,7 @@ class _DalelState extends State<Dalel> {
                 : AnimatedOpacity(
                   opacity: cardOpacity,
                   duration: Duration(seconds: 1),
-                  child: MafusoCard(
+                  child: mogremetoCard(
                     title: dalelNum,
                     subtitle: dalelTitle,
                     flip: isFlip,

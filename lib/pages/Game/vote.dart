@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mafuso/data/stories.dart';
-import 'package:mafuso/pages/Game/dalel.dart';
-import 'package:mafuso/pages/Game/doneGame.dart';
-import 'package:mafuso/widgets/button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../pages/Game/dalel.dart';
+import '../../pages/Game/doneGame.dart';
+import '../../widgets/button.dart';
 
 class Vote extends StatefulWidget {
   const Vote({
@@ -23,16 +25,52 @@ class Vote extends StatefulWidget {
 }
 
 class _VoteState extends State<Vote> {
-  final Stories storiesInstance = Stories();
-  late List<Map<String, dynamic>> accused;
+  List<dynamic>? storiesInstance;
+  late List<Map<String, dynamic>> accused = [];
 
   @override
   void initState() {
     super.initState();
-    accused = List.generate(
-      4,
-      (i) => storiesInstance.stories[widget.storyId]['accused'][i],
-    );
+    loadStories(); // تحميل البيانات بشكل غير متزامن
+  }
+
+  Future<void> loadStories() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? storedStories = prefs.getString('localStories');
+
+    if (storedStories != null) {
+      List<dynamic> decodedStories = jsonDecode(storedStories);
+
+      setState(() {
+        storiesInstance = decodedStories;
+
+        // التحقق مما إذا كان storyId صالحًا قبل الوصول إلى البيانات
+        if (widget.storyId >= 0 &&
+            widget.storyId < storiesInstance!.length &&
+            storiesInstance![widget.storyId]['accused'] != null) {
+          accused = List.generate(
+            4,
+            (i) =>
+                (i < storiesInstance![widget.storyId]['accused'].length)
+                    ? storiesInstance![widget.storyId]['accused'][i]
+                    : {
+                      'name': 'غير معروف',
+                      'type': 'غير معروف',
+                      'criminal': false,
+                    },
+          );
+        } else {
+          accused = List.generate(
+            4,
+            (i) => {
+              'name': 'غير معروف',
+              'type': 'غير معروف',
+              'criminal': false,
+            },
+          );
+        }
+      });
+    }
   }
 
   @override
