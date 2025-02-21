@@ -1,17 +1,16 @@
 import 'dart:convert';
 
+import '../pages/Game/addPlayers.dart';
+import '../pages/issues.dart';
+import '../widgets/button.dart';
+import '../models/adModel.dart';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mogremeto/data/stories.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../pages/Game/addPlayers.dart';
-import '../pages/issues.dart';
-import '../widgets/button.dart';
-import '../models/adModel.dart';
-
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -52,31 +51,33 @@ class _MenuState extends State<Menu> {
   }
 
   // ----- تحديث القصص
-  final supabase = Supabase.instance.client;
-  final localStories = Stories().stories;
   Future<void> getStories() async {
-    final stories = await Supabase.instance.client.from('stories').select();
-
-    print("🔍 البيانات القادمة من Supabase:");
-    print(stories); // ✅ طباعة البيانات بالكامل
+    final localStories = Stories().stories;
+    final response = await http.get(
+      Uri.parse(
+        'https://raw.githubusercontent.com/iskepr/Mogremeto/main/stories.json',
+      ),
+    );
+    List stories;
+    if (response.statusCode != 200) {
+      stories = localStories;
+      print("⚠️ فشل في تحميل البيانات من السرفر!");
+    } else {
+      stories = json.decode(response.body);
+    }
+    print("البيانات من السرفر");
+    print(stories);
 
     final prefs = await SharedPreferences.getInstance();
     final String? storedStoriesJson = prefs.getString('localStories');
 
-    List<dynamic> localStories =
-        storedStoriesJson != null ? jsonDecode(storedStoriesJson) : [];
-
     for (var story in stories) {
-      final storyData = story['story']; // ✅ استخراج القصة من داخل المفتاح story
-      if (storyData == null) {
+      if (story == null) {
         print("⚠️ القصة غير موجودة داخل كائن story!");
         continue;
       }
-
-      final storyId = storyData['id'];
-      final storyContent = storyData['story'];
-
-      if (storyId == null || storyContent == null) {
+      final storyId = story['id'];
+      if (storyId == null) {
         print("⚠️ القصة مفقود فيها ID أو Story!");
         continue;
       }
@@ -86,11 +87,11 @@ class _MenuState extends State<Menu> {
       if (!alreadyExists) {
         localStories.add({
           'id': storyId,
-          'story': storyContent,
-          'title': storyData['title'] ?? 'بدون عنوان',
-          'type': storyData['type'] ?? 'غير معروف',
-          'evidence': storyData['evidence'] ?? [],
-          'accused': storyData['accused'] ?? [],
+          'story': story['story'],
+          'title': story['title'],
+          'type': story['type'],
+          'evidence': story['evidence'],
+          'accused': story['accused'],
         });
       }
     }

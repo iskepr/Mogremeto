@@ -174,7 +174,7 @@ class _DoneGameState extends State<DoneGame> {
                         );
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => mogremeto()),
+                          MaterialPageRoute(builder: (context) => Mogremeto()),
                         );
                       },
                     );
@@ -182,7 +182,7 @@ class _DoneGameState extends State<DoneGame> {
                     debugPrint('Ad not loaded yet. Loading now...');
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => mogremeto()),
+                      MaterialPageRoute(builder: (context) => Mogremeto()),
                     );
                   }
                 },

@@ -2,20 +2,13 @@
 import 'package:flutter/material.dart';
 import 'widgets/splash.dart';
 
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize(
-    url: 'https://phikpklispzjtqnhlwso.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoaWtwa2xpc3B6anRxbmhsd3NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5ODQ1MzQsImV4cCI6MjA1NTU2MDUzNH0.IyMavDFi3w16ulxuaEqcnB2btP8GkDc27Pd_bDwGtzk',
-  );
-  runApp(const mogremeto());
+  runApp(const Mogremeto());
 }
 
-class mogremeto extends StatelessWidget {
-  const mogremeto({super.key});
+class Mogremeto extends StatelessWidget {
+  const Mogremeto({super.key});
 
   @override
   Widget build(BuildContext context) {

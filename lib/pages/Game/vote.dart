@@ -120,7 +120,7 @@ class _VoteState extends State<Vote> {
                                                   ? DoneGame(
                                                     storyId: widget.storyId,
                                                     inTitle:
-                                                        "الف مبروج قبضطم علي المجرميتو",
+                                                        "الف مبروج قبضطم علي المُجرميتو",
                                                     butTitle: "تم حل القضية",
                                                     soundName: 'intro',
                                                   )
