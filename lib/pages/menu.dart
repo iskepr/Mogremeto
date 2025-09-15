@@ -1,9 +1,10 @@
 import 'dart:convert';
 
+import 'package:startapp_sdk/startapp.dart';
+
 import '../pages/Game/addPlayers.dart';
 import '../pages/issues.dart';
 import '../widgets/button.dart';
-import '../models/adModel.dart';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
@@ -11,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mogremeto/data/stories.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
@@ -25,29 +25,30 @@ class Menu extends StatefulWidget {
 
 class _MenuState extends State<Menu> {
   // ----- الاعلان
-  RewardedAd? _rewardedAd;
+  var startAppSdk = StartAppSdk();
 
-  void loadAd() {
-    RewardedAd.load(
-      adUnitId: AdModel.adUnitawardId,
-      request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        onAdLoaded: (ad) {
-          debugPrint('$ad loaded.');
-          _rewardedAd = ad;
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          debugPrint('RewardedAd failed to load: $error');
-        },
-      ),
-    );
-  }
+  StartAppBannerAd? bannerAd;
 
   @override
   void initState() {
     super.initState();
     getStories();
     checkForUpdate();
+    startAppSdk.setTestAdsEnabled(true);
+
+    startAppSdk
+        .loadBannerAd(StartAppBannerType.BANNER)
+        .then((bannerAd) {
+          setState(() {
+            this.bannerAd = bannerAd;
+          });
+        })
+        .onError<StartAppException>((ex, stackTrace) {
+          debugPrint("مش لاقيييييييييييييييي الاعلاااان واحددد: ${ex.message}");
+        })
+        .onError((error, stackTrace) {
+          debugPrint("مش لاقيييييييييييييييي الاعلاااان اتنييننننن: $error");
+        });
   }
 
   // ----- تحديث القصص
@@ -65,11 +66,8 @@ class _MenuState extends State<Menu> {
     } else {
       stories = json.decode(response.body);
     }
-    print("البيانات من السرفر");
-    print(stories);
 
     final prefs = await SharedPreferences.getInstance();
-    final String? storedStoriesJson = prefs.getString('localStories');
 
     for (var story in stories) {
       if (story == null) {
@@ -97,12 +95,6 @@ class _MenuState extends State<Menu> {
     }
 
     await prefs.setString('localStories', jsonEncode(localStories));
-
-    print("✅ تم تحديث القصص المخزنة محليًا.");
-    print("-----------------------------------------------------");
-    print("📌 القصص المخزنة محليًا:");
-
-    print("$storedStoriesJson");
   }
 
   // ----- تحديث التطبيق
@@ -146,40 +138,36 @@ class _MenuState extends State<Menu> {
   void _showUpdateDialog(String downloadUrl) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Color(0xFFFFF0CC),
-            title: Text(
-              "!تحديث جديد متاح",
-              textAlign: TextAlign.right,
-              style: TextStyle(color: Color(0xFF822222)),
-            ),
-            content: Text(
-              ".يفضل تحديث اللعبة عشان احدث المميزات",
-              textAlign: TextAlign.right,
-              style: TextStyle(color: Color(0xFF822222)),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  "لاحقًا",
-                  style: TextStyle(color: Color(0xFF822222)),
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  if (await canLaunch(downloadUrl)) {
-                    await launch(downloadUrl);
-                  }
-                },
-                child: Text(
-                  "تحديث الآن",
-                  style: TextStyle(color: Color(0xFF822222)),
-                ),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        backgroundColor: Color(0xFFFFF0CC),
+        title: Text(
+          "!تحديث جديد متاح",
+          textAlign: TextAlign.right,
+          style: TextStyle(color: Color(0xFF822222)),
+        ),
+        content: Text(
+          ".يفضل تحديث اللعبة عشان احدث المميزات",
+          textAlign: TextAlign.right,
+          style: TextStyle(color: Color(0xFF822222)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("لاحقًا", style: TextStyle(color: Color(0xFF822222))),
           ),
+          TextButton(
+            onPressed: () async {
+              if (await canLaunch(downloadUrl)) {
+                await launch(downloadUrl);
+              }
+            },
+            child: Text(
+              "تحديث الآن",
+              style: TextStyle(color: Color(0xFF822222)),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -197,7 +185,7 @@ class _MenuState extends State<Menu> {
               child: SvgPicture.asset('assets/imgs/cornerTL.svg', width: 150),
             ),
             Positioned(
-              bottom: 30,
+              bottom: 40,
               right: 10,
               child: SvgPicture.asset('assets/imgs/cornerBR.svg', width: 150),
             ),
@@ -224,33 +212,12 @@ class _MenuState extends State<Menu> {
                                   AssetSource('sounds/click.mp3'),
                                 );
                               }
-                              if (_rewardedAd != null) {
-                                _rewardedAd!.show(
-                                  onUserEarnedReward: (
-                                    AdWithoutView ad,
-                                    RewardItem reward,
-                                  ) {
-                                    debugPrint(
-                                      'User earned reward: ${reward.amount} ${reward.type}',
-                                    );
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => AddPlayers(),
-                                      ),
-                                    );
-                                  },
-                                );
-                              } else {
-                                debugPrint('Ad not loaded yet. Loading now...');
-                                // loadAd();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AddPlayers(),
-                                  ),
-                                );
-                              }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddPlayers(),
+                                ),
+                              );
                             },
                           ),
                           Button(
@@ -277,8 +244,42 @@ class _MenuState extends State<Menu> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 150),
+                  GestureDetector(
+                    onTap: () async {
+                      await launch('https://iskepr.github.io');
+                    },
+                    child: Column(
+                      children: const [
+                        Text(
+                          'برمجة',
+                          style: TextStyle(
+                            color: Color(0xFF228272),
+                            fontSize: 20,
+                            letterSpacing: -1,
+                          ),
+                        ),
+                        Text(
+                          'سكيبر',
+                          style: TextStyle(
+                            color: Color(0xFF822222),
+                            fontSize: 30,
+                            letterSpacing: -1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 70),
                 ],
+              ),
+            ),
+            Positioned(
+              bottom: -20,
+              right: 30,
+              child: Expanded(
+                child: bannerAd != null
+                    ? StartAppBanner(bannerAd!)
+                    : Container(),
               ),
             ),
           ],

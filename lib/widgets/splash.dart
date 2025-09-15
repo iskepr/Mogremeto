@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -35,14 +36,10 @@ class _SplashState extends State<Splash> {
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) => Menu(),
               transitionDuration: Duration(milliseconds: 500), // مدة الاختفاء
-              transitionsBuilder: (
-                context,
-                animation,
-                secondaryAnimation,
-                child,
-              ) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
             ),
           );
         });
@@ -77,7 +74,7 @@ class _SplashState extends State<Splash> {
                         ),
                       ),
                       Text(
-                        'سكيبر',
+                        'سكِيبر',
                         style: TextStyle(
                           color: Color(0xFFFFF0CC),
                           fontSize: 30,
