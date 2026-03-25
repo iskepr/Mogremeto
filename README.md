@@ -1,16 +1,14 @@
-# mogremeto
+# 🕵️‍♂️ طريقة لعب "مُجرميتو"
 
-A new Flutter project.
+لعبة شك وتخوين من الدرجة الأولى، الهدف منها إنكم تطلعوا "المُجرميتو" اللي مستخبي وسطكم.
 
-## Getting Started
+### 📋 القوانين الأساسية:
+1. **توزيع الأدوار:** كل لاعب بيسحب كارت بيعرفه وظيفته (زي طباخ، سباك، خياط.. إلخ).
+2. **المُجرم المستخبي:** واحد بس من الـ 4 لاعيبة هو اللي كارتُه بيقول إنه **"مُجرميتو"**، والباقي ناس بريئة وليها وظايف عادية.
+3. **الجولات:** اللعبة بتتلعب على **3 جولات**.
+4. **الدلائل:** في بداية كل جولة، بيظهر "دليل" جديد عن الجريمة (زي أداة الجريمة، أو رسالة سابها القاتل).
+5. **المناقشة والتصويت:** بعد كل دليل، بتبدأوا "تلبسوا" التهمة لبعض بالمنطق أو بالهبد، وفي آخر الجولة بتصوتوا على أكتر واحد شاكين فيه عشان يخرج بره اللعبة.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 🏆 إزاي تكسب؟
+* **الناس البريئة:** تكسب لو قدرتوا تصوتوا على "المُجرميتو" وتخرجوه قبل ما الجولات تخلص.
+* **المُجرميتو:** يكسب لو قدر يخدعكم ويمثل إنه بريء لحد آخر اللعبة من غير ما يتكشف.
