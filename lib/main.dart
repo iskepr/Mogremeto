@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
-import 'widgets/splash.dart';
+import "package:flutter/material.dart";
+import "package:flutter_localizations/flutter_localizations.dart";
 
-void main() async {
+import "features/splash/views/splash_view.dart";
+import "generated/l10n.dart";
+
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const Mogremeto());
 }
@@ -13,17 +16,28 @@ class Mogremeto extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'مُجرميتو',
+      title: "مُجرميتو",
+
+      // لغة التطبيق
+      locale: const Locale("ar"),
+      localizationsDelegates: const [
+        S.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: S.delegate.supportedLocales,
+
       theme: ThemeData(
-        fontFamily: 'foda',
-        textTheme: TextTheme(
+        fontFamily: "foda",
+        textTheme: const TextTheme(
           bodyLarge: TextStyle(color: Color(0xFF822222), fontSize: 20),
           bodyMedium: TextStyle(color: Color(0xFFFFF0CC), fontSize: 20),
           bodySmall: TextStyle(color: Color(0xFF228272), fontSize: 20),
         ),
-        scaffoldBackgroundColor: Color(0xFF822222),
+        scaffoldBackgroundColor: const Color(0xFF822222),
       ),
-      routes: {'/': (context) => Splash()},
+      routes: {"/": (context) => const SplashView()},
     );
   }
 }
