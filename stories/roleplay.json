@@ -3,11 +3,11 @@
         "id": 1,
         "title": "سرقة خزنة",
         "type": "سرقة",
-        "accused": [
-            { "type": "مُحاسب", "criminal": false },
-            { "type": "مُهندس ديكور", "criminal": false },
-            { "type": "مُوظف استقبال", "criminal": false },
-            { "type": "كهربائي", "criminal": true }
+        "suspects": [
+            { "name": "مُحاسب", "is_culprit": false },
+            { "name": "مُهندس ديكور", "is_culprit": false },
+            { "name": "مُوظف استقبال", "is_culprit": false },
+            { "name": "كهربائي", "is_culprit": true }
         ],
         "evidence": [
             "الخزنة في فندق",
@@ -22,11 +22,11 @@
         "id": 2,
         "title": "تزوير وثائق",
         "type": "تزوير",
-        "accused": [
-            { "type": "موظف حكومي", "criminal": true },
-            { "type": "مراجع حسابات", "criminal": false },
-            { "type": "مواطن", "criminal": false },
-            { "type": "محامٍ", "criminal": false }
+        "suspects": [
+            { "name": "موظف حكومي", "is_culprit": true },
+            { "name": "مراجع حسابات", "is_culprit": false },
+            { "name": "مواطن", "is_culprit": false },
+            { "name": "محامٍ", "is_culprit": false }
         ],
         "evidence": [
             "اكتشاف وثائق مزورة",
@@ -41,11 +41,11 @@
         "id": 3,
         "title": "اختفاء لوحة الفنية",
         "type": "سرقة",
-        "accused": [
-            { "type": "حارس أمن", "criminal": false },
-            { "type": "فنان تشكيلي", "criminal": true },
-            { "type": "منظف", "criminal": false },
-            { "type": "زائر", "criminal": false }
+        "suspects": [
+            { "name": "حارس أمن", "is_culprit": false },
+            { "name": "فنان تشكيلي", "is_culprit": true },
+            { "name": "منظف", "is_culprit": false },
+            { "name": "زائر", "is_culprit": false }
         ],
         "evidence": [
             "اللوحة كانت في معرض فني",
@@ -60,11 +60,11 @@
         "id": 4,
         "title": "اختراق دكتور جامعي",
         "type": "اختراق",
-        "accused": [
-            { "type": "زوجة الدكتور", "criminal": false },
-            { "type": "مساعد الدكتور", "criminal": false },
-            { "type": "طالب", "criminal": true },
-            { "type": "صديق الدكتور", "criminal": false }
+        "suspects": [
+            { "name": "زوجة الدكتور", "is_culprit": false },
+            { "name": "مساعد الدكتور", "is_culprit": false },
+            { "name": "طالب", "is_culprit": true },
+            { "name": "صديق الدكتور", "is_culprit": false }
         ],
         "evidence": [
             "الدكتور حس انه مراقب",
@@ -79,11 +79,11 @@
         "id": 5,
         "title": "اختفاء كميات هائلة من القهوة",
         "type": "سرقة",
-        "accused": [
-            { "type": "مدير الكافيه", "criminal": false },
-            { "type": "عامل تحضير القهوة", "criminal": true },
-            { "type": "زبون دائم", "criminal": false },
-            { "type": "عامل توصيل", "criminal": false }
+        "suspects": [
+            { "name": "مدير الكافيه", "is_culprit": false },
+            { "name": "عامل تحضير القهوة", "is_culprit": true },
+            { "name": "زبون دائم", "is_culprit": false },
+            { "name": "عامل توصيل", "is_culprit": false }
         ],
         "evidence": [
             "الكافيه كان بيشتري قهوة أكتر من المعتاد",
@@ -98,11 +98,11 @@
         "id": 6,
         "title": "اختفاء طفل",
         "type": "خطف",
-        "accused": [
-            { "type": "اخو الطفل", "criminal": false },
-            { "type": "لاعب ببجي", "criminal": true },
-            { "type": "مُعلم الطفل", "criminal": false },
-            { "type": "حارس الأمن", "criminal": false }
+        "suspects": [
+            { "name": "اخو الطفل", "is_culprit": false },
+            { "name": "لاعب ببجي", "is_culprit": true },
+            { "name": "مُعلم الطفل", "is_culprit": false },
+            { "name": "حارس الأمن", "is_culprit": false }
         ],
         "evidence": [
             "الطفل كان مدلل من اهله",
@@ -115,11 +115,11 @@
         "id": 7,
         "title": "سرقة ساعة أثرية",
         "type": "سرقة",
-        "accused": [
-            { "type": "حارس المتحف", "criminal": false },
-            { "type": "مرشد سياحي", "criminal": true },
-            { "type": "سائح أجنبي", "criminal": false },
-            { "type": "منظف المتحف", "criminal": false }
+        "suspects": [
+            { "name": "حارس المتحف", "is_culprit": false },
+            { "name": "مرشد سياحي", "is_culprit": true },
+            { "name": "سائح أجنبي", "is_culprit": false },
+            { "name": "منظف المتحف", "is_culprit": false }
         ],
         "evidence": [
             "الكاميرات اتقفلت دقيقتين وقت السرقة",
@@ -134,11 +134,11 @@
         "id": 8,
         "title": "اختفاء ملف سري من شركة برمجيات",
         "type": "اختراق",
-        "accused": [
-            { "type": "مطور برمجيات", "criminal": false },
-            { "type": "مدير المشروع", "criminal": true },
-            { "type": "موظف مُستقيل", "criminal": false },
-            { "type": "محلل نظم", "criminal": false }
+        "suspects": [
+            { "name": "مطور برمجيات", "is_culprit": false },
+            { "name": "مدير المشروع", "is_culprit": true },
+            { "name": "موظف مُستقيل", "is_culprit": false },
+            { "name": "محلل نظم", "is_culprit": false }
         ],
         "evidence": [
             "الاختراق تم بحساب له صلاحيات عليا",
@@ -153,11 +153,11 @@
         "id": 9,
         "title": "قتل مصور في حفلة موسيقية",
         "type": "قتل",
-        "accused": [
-            { "type": "عازف جيتار", "criminal": false },
-            { "type": "مغني", "criminal": false },
-            { "type": "مدير الفرقة", "criminal": true },
-            { "type": "مصور جديد", "criminal": false }
+        "suspects": [
+            { "name": "عازف جيتار", "is_culprit": false },
+            { "name": "مغني", "is_culprit": false },
+            { "name": "مدير الفرقة", "is_culprit": true },
+            { "name": "مصور جديد", "is_culprit": false }
         ],
         "evidence": [
             "كان ف مشاكل بين المصور الجديد والقديم",
@@ -172,11 +172,11 @@
         "id": 10,
         "title": "ابتزاز صاحب شركة",
         "type": "ابتزاز",
-        "accused": [
-            { "type": "سكرتير", "criminal": false },
-            { "type": "محامي", "criminal": true },
-            { "type": "موظف", "criminal": false },
-            { "type": "محاسب", "criminal": false }
+        "suspects": [
+            { "name": "سكرتير", "is_culprit": false },
+            { "name": "محامي", "is_culprit": true },
+            { "name": "موظف", "is_culprit": false },
+            { "name": "محاسب", "is_culprit": false }
         ],
         "evidence": [
             "التهديدات فيها تفاصيل داخلية دقيقة",
@@ -191,11 +191,11 @@
         "id": 11,
         "title": "حريق مستودع التخزين",
         "type": "حريق",
-        "accused": [
-            { "type": "مالك المستودع", "criminal": true },
-            { "type": "منافس تجاري", "criminal": false },
-            { "type": "موظف سابق", "criminal": false },
-            { "type": "طليقة المالك", "criminal": false }
+        "suspects": [
+            { "name": "مالك المستودع", "is_culprit": true },
+            { "name": "منافس تجاري", "is_culprit": false },
+            { "name": "موظف سابق", "is_culprit": false },
+            { "name": "طليقة المالك", "is_culprit": false }
         ],
         "evidence": [
             "مصدر الحريق متعدد مما يشير إلى أكثر من مشتعل",
@@ -210,11 +210,11 @@
         "id": 12,
         "title": "تسمم خفيف للعريس في فرحه",
         "type": "تسمم",
-        "accused": [
-            { "type": "طاهي الحفل", "criminal": false },
-            { "type": "صديقة العروس", "criminal": false },
-            { "type": "عمة العروسة", "criminal": false },
-            { "type": "والد العروس", "criminal": true }
+        "suspects": [
+            { "name": "طاهي الحفل", "is_culprit": false },
+            { "name": "صديقة العروس", "is_culprit": false },
+            { "name": "عمة العروسة", "is_culprit": false },
+            { "name": "والد العروس", "is_culprit": true }
         ],
         "evidence": [
             "صحبة العروسة كانت محروقة منها",
@@ -229,11 +229,11 @@
         "id": 13,
         "title": "سرقة أكونت الفود بلوجر",
         "type": "سرقة إلكترونية",
-        "accused": [
-            { "type": "صاحب مطعم", "criminal": false },
-            { "type": "صانع محتوى", "criminal": false },
-            { "type": "مدير أعمال", "criminal": false },
-            { "type": "مُحاسب الشركة", "criminal": true }
+        "suspects": [
+            { "name": "صاحب مطعم", "is_culprit": false },
+            { "name": "صانع محتوى", "is_culprit": false },
+            { "name": "مدير أعمال", "is_culprit": false },
+            { "name": "مُحاسب الشركة", "is_culprit": true }
         ],
         "evidence": [
             "الجريمة حصلت في لوكيشن تصوير",
@@ -248,11 +248,11 @@
         "id": 14,
         "title": "سبوبة قرض البنك",
         "type": "تزوير",
-        "accused": [
-            { "type": "مدير الفرع", "criminal": false },
-            { "type": "موظف مبيعات", "criminal": false },
-            { "type": "سكرتير المدير", "criminal": false },
-            { "type": "أوفيس بوي", "criminal": true }
+        "suspects": [
+            { "name": "مدير الفرع", "is_culprit": false },
+            { "name": "موظف مبيعات", "is_culprit": false },
+            { "name": "سكرتير المدير", "is_culprit": false },
+            { "name": "أوفيس بوي", "is_culprit": true }
         ],
         "evidence": [
             "الختم اتسرق من درج المكتب",
@@ -267,11 +267,11 @@
         "id": 15,
         "title": "تامر والورث المسموم",
         "type": "قتل",
-        "accused": [
-            { "type": "بواب العمارة", "criminal": false },
-            { "type": "جار القتيل", "criminal": false },
-            { "type": "جزار السوبر ماركت", "criminal": false },
-            { "type": "أخو القتيل", "criminal": true }
+        "suspects": [
+            { "name": "بواب العمارة", "is_culprit": false },
+            { "name": "جار القتيل", "is_culprit": false },
+            { "name": "جزار السوبر ماركت", "is_culprit": false },
+            { "name": "أخو القتيل", "is_culprit": true }
         ],
         "evidence": [
             "الجريمة حصلت الساعة 10 بالليل",
@@ -286,11 +286,11 @@
         "id": 16,
         "title": "انتقام الميك أب أرتيست",
         "type": "قتل",
-        "accused": [
-            { "type": "طباخة الكيترينج", "criminal": false },
-            { "type": "مصممة الفستان", "criminal": false },
-            { "type": "صديقة العروسة", "criminal": false },
-            { "type": "الميك أب أرتيست", "criminal": true }
+        "suspects": [
+            { "name": "طباخة الكيترينج", "is_culprit": false },
+            { "name": "مصممة الفستان", "is_culprit": false },
+            { "name": "صديقة العروسة", "is_culprit": false },
+            { "name": "الميك أب أرتيست", "is_culprit": true }
         ],
         "evidence": [
             "العريس اتقتل بسكينة من المطبخ",
@@ -305,11 +305,11 @@
         "id": 17,
         "title": "سرقة حقنة الفيلر",
         "type": "سرقة",
-        "accused": [
-            { "type": "دكتور تجميل", "criminal": false },
-            { "type": "ممرض", "criminal": false },
-            { "type": "فرد أمن", "criminal": true },
-            { "type": "مريض", "criminal": false }
+        "suspects": [
+            { "name": "دكتور تجميل", "is_culprit": false },
+            { "name": "ممرض", "is_culprit": false },
+            { "name": "فرد أمن", "is_culprit": true },
+            { "name": "مريض", "is_culprit": false }
         ],
         "evidence": [
             "الحقنة كانت في تلاجة العيادة",
@@ -324,11 +324,11 @@
         "id": 18,
         "title": "جريمة نادي الجزيرة (كيكة الموت)",
         "type": "قتل خطأ",
-        "accused": [
-            { "type": "شيف مخبوزات", "criminal": true },
-            { "type": "دكتور متقاعد", "criminal": false },
-            { "type": "عضو بالنادي", "criminal": false },
-            { "type": "جرسون", "criminal": false }
+        "suspects": [
+            { "name": "شيف مخبوزات", "is_culprit": true },
+            { "name": "دكتور متقاعد", "is_culprit": false },
+            { "name": "عضو بالنادي", "is_culprit": false },
+            { "name": "جرسون", "is_culprit": false }
         ],
         "evidence": [
             "الضحية بطل يتنفس فجأة وهو بياكل",
@@ -343,11 +343,11 @@
         "id": 19,
         "title": "اغتيال الروح الرمضانية (سرقة الفانوس)",
         "type": "سرقة",
-        "accused": [
-            { "type": "الجار", "criminal": false },
-            { "type": "شخص خسر شغله", "criminal": true },
-            { "type": "عامل دليفري", "criminal": false },
-            { "type": "طفل مشاغب", "criminal": false }
+        "suspects": [
+            { "name": "الجار", "is_culprit": false },
+            { "name": "شخص خسر شغله", "is_culprit": true },
+            { "name": "عامل دليفري", "is_culprit": false },
+            { "name": "طفل مشاغب", "is_culprit": false }
         ],
         "evidence": [
             "الفانوس اتسرق من بلكونة الدور الأول",
@@ -362,11 +362,11 @@
         "id": 20,
         "title": "سرقة خاتم الشبكة",
         "type": "سرقة",
-        "accused": [
-            { "type": "أخت العروسة", "criminal": false },
-            { "type": "مصور الحفل", "criminal": true },
-            { "type": "عامل البوفيه", "criminal": false },
-            { "type": "صديق العريس", "criminal": false }
+        "suspects": [
+            { "name": "أخت العروسة", "is_culprit": false },
+            { "name": "مصور الحفل", "is_culprit": true },
+            { "name": "عامل البوفيه", "is_culprit": false },
+            { "name": "صديق العريس", "is_culprit": false }
         ],
         "evidence": [
             "الخاتم اختفى وقت 'السيشن' بتاع الصور",

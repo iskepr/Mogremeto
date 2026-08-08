@@ -1,10 +1,7 @@
-import "dart:convert";
-
-import "package:audioplayers/audioplayers.dart";
-import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
-import "package:shared_preferences/shared_preferences.dart";
 
+import "../../../../core/helpers/audio_helper.dart";
+import "../../../../core/models/data_typs.dart";
 import "../../../../core/widgets/button.dart";
 import "card_view.dart";
 import "dalel.dart";
@@ -16,107 +13,65 @@ class SetCharacter extends StatefulWidget {
     required this.player2,
     required this.player3,
     required this.player4,
-    required this.storyId,
+    required this.caseData,
   });
 
   final String player1;
   final String player2;
   final String player3;
   final String player4;
-  final int storyId;
+  final CaseModel caseData;
 
   @override
   State<SetCharacter> createState() => _SetCharacterState();
 }
 
 class _SetCharacterState extends State<SetCharacter> {
-  List<dynamic>? storiesInstance;
-  int playerId = 0;
+  int playerIndex = 0;
   bool flip = false;
 
-  late int storyId;
-  late String player;
-  late String type;
-  late bool isMogrem;
+  late CaseModel caseData;
+  late Suspect suspect;
+  late String playerName;
 
   @override
   void initState() {
     super.initState();
-    storyId = widget.storyId;
+    caseData = widget.caseData;
     _updatePlayerData();
-    loadStories();
-  }
-
-  Future<void> loadStories() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedStories = prefs.getString("localStories");
-
-    if (storedStories != null) {
-      final List<dynamic> decodedStories = jsonDecode(storedStories);
-      setState(() {
-        storiesInstance = decodedStories;
-      });
-
-      if (decodedStories.isEmpty) {
-        setState(() {
-          storyId = -1;
-        });
-      } else {
-        // تأكد من تحديث بيانات اللاعب بعد تحميل القصص
-        _updatePlayerData();
-      }
-    }
   }
 
   void _updatePlayerData() {
-    if (storiesInstance == null ||
-        storyId == -1 ||
-        storyId >= (storiesInstance?.length ?? 0)) {
-      return;
-    }
-
     setState(() {
-      debugPrint("Updating player data for playerId: $playerId");
+      debugPrint("Updating player data for playerId: $playerIndex");
 
-      switch (playerId) {
+      switch (playerIndex) {
         case 0:
-          player = widget.player1;
+          playerName = widget.player1;
         case 1:
-          player = widget.player2;
+          playerName = widget.player2;
         case 2:
-          player = widget.player3;
+          playerName = widget.player3;
         case 3:
-          player = widget.player4;
+          playerName = widget.player4;
         default:
-          player = "غير معروف";
+          playerName = "غير معروف";
           return;
       }
-
-      final currentStory = storiesInstance![storyId];
-
-      if (currentStory.containsKey("accused") &&
-          playerId < currentStory["accused"].length) {
-        type = currentStory["accused"][playerId]["type"] ?? "غير معروف";
-        isMogrem = currentStory["accused"][playerId]["criminal"] ?? false;
-      } else {
-        type = "غير معروف";
-        isMogrem = false;
-      }
+      suspect = caseData.suspects[playerIndex];
 
       flip = false;
     });
   }
 
   void handle() {
-    if (storiesInstance == null || storyId == -1) return;
-
-    if (playerId == 3) {
+    if (playerIndex == (caseData.suspects.length - 1)) {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => Dalel(
-            storyId: storyId,
-            inTitle: 'الجريمة هي\n${storiesInstance![storyId]['title']}',
+            caseData: caseData,
+            inTitle: "الجريمة هي\n${caseData.title}",
             dalelId: 0,
             outUsers: const [],
           ),
@@ -124,7 +79,7 @@ class _SetCharacterState extends State<SetCharacter> {
       );
     } else {
       setState(() {
-        playerId++;
+        playerIndex++;
         _updatePlayerData();
       });
     }
@@ -139,24 +94,17 @@ class _SetCharacterState extends State<SetCharacter> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              "ادي التليفون ل$player",
+              "ادي التليفون ل$playerName",
               style: const TextStyle(color: Color(0xFF228272), fontSize: 40),
             ),
             CardView(
               title: "المهنة",
-              subtitle: '$type\n${isMogrem ? '(مُجرميتو)' : ''}',
-              flip: flip, // <-- تمرير حالة القلب إلى الكارت
-              onFlip: () async {
-                setState(() {
-                  flip = !flip; // <-- عندما ينقلب الكارت، يتم تحديث حالته
-                });
-                if (kIsWeb) {
-                  await AudioPlayer().play(
-                    UrlSource("assets/sounds/flipcard.mp3"),
-                  );
-                } else {
-                  await AudioPlayer().play(AssetSource("sounds/flipcard.mp3"));
-                }
+              subtitle:
+                  "${suspect.name}\n${suspect.isCulprit ? "(مُجرميتو)" : ""}",
+              flip: flip,
+              onFlip: () {
+                setState(() => flip = !flip);
+                AudioHelper.runSound("flipcard");
               },
             ),
             Padding(

@@ -42,4 +42,7 @@ class Suspect {
     description: map["description"] ?? "",
     isCulprit: map["is_culprit"] ?? false,
   );
+
+  @override
+  String toString() => toMap().toString();
 }

@@ -37,4 +37,7 @@ class EvidenceDocument {
         image: map["image"] ?? "",
         content: map["content"] ?? "",
       );
+
+  @override
+  String toString() => toMap().toString();
 }

@@ -1,11 +1,10 @@
-import "dart:convert";
 import "dart:math";
 
-import "package:audioplayers/audioplayers.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
-import "package:shared_preferences/shared_preferences.dart";
 
+import "../../../core/data/app_data.dart";
+import "../../../core/helpers/audio_helper.dart";
 import "../../../core/widgets/button.dart";
 import "../../../core/widgets/input.dart";
 import "../../main_menu/views/main_menu_view.dart";
@@ -19,22 +18,11 @@ class AddPlayers extends StatefulWidget {
 }
 
 class _AddPlayersState extends State<AddPlayers> {
-  // نقل المتحكمات هنا لتجنب إعادة الإنشاء
   final player1 = TextEditingController();
   final player2 = TextEditingController();
   final player3 = TextEditingController();
   final player4 = TextEditingController();
-  late List<dynamic> storiesInstance = [];
-  int storyId = -1;
-
-  @override
-  void dispose() {
-    player1.dispose();
-    player2.dispose();
-    player3.dispose();
-    player4.dispose();
-    super.dispose();
-  }
+  int caseId = -1;
 
   bool validateFields() {
     return player1.text.isNotEmpty &&
@@ -46,65 +34,10 @@ class _AddPlayersState extends State<AddPlayers> {
   @override
   void initState() {
     super.initState();
-    loadStories();
-  }
 
-  Future<void> loadStories() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedStories = prefs.getString("localStories");
-
-    if (storedStories != null) {
-      setState(() {
-        storiesInstance = jsonDecode(storedStories);
-      });
-
-      if (storiesInstance.isEmpty) {
-        setState(() {
-          storyId = -1;
-        });
-        return;
-      }
-
-      getStoryId();
-    }
-  }
-
-  Future<void> getStoryId() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String>? doneStories = prefs.getStringList("doneStories");
-
-    // تأكد من أن storiesInstance ليس فارغًا
-    if (storiesInstance.isEmpty) {
-      debugPrint("Error: storiesInstance is empty!");
-      setState(() {
-        storyId = -1;
-      });
-      return;
-    }
-
-    final List<int> usedIds = doneStories?.map(int.parse).toList() ?? [];
-    final List<int> availableIds = List.generate(
-      storiesInstance.length,
-      (index) => index,
-    ).where((id) => !usedIds.contains(id)).toList();
-
-    debugPrint("Available IDs: $availableIds");
-
-    // تأكد من أن availableIds يحتوي على بيانات
-    if (availableIds.isEmpty) {
-      debugPrint("Error: No available story IDs!");
-      setState(() {
-        storyId = -1;
-      });
-      return;
-    }
-
-    final int newStoryId = availableIds[Random().nextInt(availableIds.length)];
-    setState(() {
-      storyId = newStoryId;
-    });
-
-    debugPrint("Selected Story ID: $storyId");
+    caseId = AppData.availableCasesIds.elementAt(
+      Random().nextInt(AppData.availableCasesIds.length),
+    );
   }
 
   @override
@@ -114,7 +47,7 @@ class _AddPlayersState extends State<AddPlayers> {
       body: SizedBox(
         width: double.infinity,
         child: Center(
-          child: storyId == -1
+          child: caseId == -1
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -166,17 +99,9 @@ class _AddPlayersState extends State<AddPlayers> {
                         padding: const EdgeInsets.symmetric(horizontal: 50),
                         child: Button(
                           title: "أبدأ التحقيق",
-                          onTap: () async {
-                            if (kIsWeb) {
-                              await AudioPlayer().play(
-                                UrlSource("assets/sounds/click.mp3"),
-                              );
-                            } else {
-                              await AudioPlayer().play(
-                                AssetSource("sounds/click.mp3"),
-                              );
-                            }
-                            // التحقق من الحقول
+                          onTap: () {
+                            AudioHelper.runSound("click");
+
                             if (validateFields()) {
                               if (context.mounted) {
                                 Navigator.push(
@@ -187,7 +112,9 @@ class _AddPlayersState extends State<AddPlayers> {
                                       player2: player2.text,
                                       player3: player3.text,
                                       player4: player4.text,
-                                      storyId: storyId,
+                                      caseData: AppData.cases.firstWhere(
+                                        (c) => c.id == caseId,
+                                      ),
                                     ),
                                   ),
                                 );
@@ -223,6 +150,15 @@ class _AddPlayersState extends State<AddPlayers> {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(IntProperty("storyId", storyId));
+    properties.add(IntProperty("storyId", caseId));
+  }
+
+  @override
+  void dispose() {
+    player1.dispose();
+    player2.dispose();
+    player3.dispose();
+    player4.dispose();
+    super.dispose();
   }
 }

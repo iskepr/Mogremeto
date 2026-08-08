@@ -16,4 +16,7 @@ class Location {
 
   factory Location.fromMap(Map<String, dynamic> map) =>
       Location(name: map["name"] ?? "", image: map["image"] ?? "");
+
+  @override
+  String toString() => toMap().toString();
 }

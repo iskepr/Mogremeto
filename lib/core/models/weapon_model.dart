@@ -16,4 +16,7 @@ class Weapon {
 
   factory Weapon.fromMap(Map<String, dynamic> map) =>
       Weapon(name: map["name"] ?? "", image: map["image"] ?? "");
+
+  @override
+  String toString() => toMap().toString();
 }

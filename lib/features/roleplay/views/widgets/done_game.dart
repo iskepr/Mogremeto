@@ -1,23 +1,23 @@
 import "dart:async";
-import "dart:convert";
 
-import "package:audioplayers/audioplayers.dart";
-import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
-import "package:shared_preferences/shared_preferences.dart";
 
+import "../../../../core/data/app_data.dart";
+import "../../../../core/helpers/audio_helper.dart";
+import "../../../../core/helpers/hive_helper.dart";
+import "../../../../core/models/data_typs.dart";
 import "../../../../core/widgets/button.dart";
 import "../../../../main.dart";
 
 class DoneGame extends StatefulWidget {
   const DoneGame({
     super.key,
-    required this.storyId,
+    required this.caseData,
     required this.inTitle,
     required this.butTitle,
     required this.soundName,
   });
-  final int storyId;
+  final CaseModel caseData;
   final String inTitle;
   final String butTitle;
   final String soundName;
@@ -34,16 +34,11 @@ class _DoneGameState extends State<DoneGame> {
   @override
   void initState() {
     super.initState();
-    loadStories();
     Timer(const Duration(milliseconds: 500), () {
       setState(() {
         cardOpacity = 1;
       });
-      if (kIsWeb) {
-        AudioPlayer().play(UrlSource("assets/sounds/${widget.soundName}.mp3"));
-      } else {
-        AudioPlayer().play(AssetSource("sounds/${widget.soundName}.mp3"));
-      }
+      AudioHelper.runSound(widget.soundName);
       Timer(const Duration(seconds: 5), () {
         setState(() {
           cardOpacity = 0;
@@ -63,36 +58,10 @@ class _DoneGameState extends State<DoneGame> {
     });
   }
 
-  Future<void> loadStories() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedStories = prefs.getString("localStories");
-
-    if (storedStories != null) {
-      final List<dynamic> decodedStories = jsonDecode(storedStories);
-
-      setState(() {
-        storiesInstance = decodedStories;
-      });
-    }
-  }
-
-  Future<void> saveData() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    // جلب القائمة الحالية من SharedPreferences
-    List<String>? doneStories = prefs.getStringList("doneStories");
-
-    // إذا كانت القائمة فارغة، ننشئ قائمة جديدة
-    doneStories ??= [];
-
-    // إضافة الـ ID الجديد إلى القائمة
-    if (!doneStories.contains(widget.storyId.toString())) {
-      doneStories.add(widget.storyId.toString());
-    }
-
-    // حفظ القائمة المحدثة
-    await prefs.setStringList("doneStories", doneStories);
-    debugPrint(prefs.getStringList("doneStories").toString());
+  Future<void> saveDoneId() async {
+    final doneCases = AppData.doneCasesIds;
+    doneCases.add(widget.caseData.id);
+    HiveHelper.saveListData(kBoxDoneCases, doneCases);
   }
 
   void loadAd() {}
@@ -116,7 +85,7 @@ class _DoneGameState extends State<DoneGame> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
-                        storiesInstance?[widget.storyId]["story"],
+                        widget.caseData.story,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Color(0xFF822222),
@@ -147,7 +116,7 @@ class _DoneGameState extends State<DoneGame> {
               child: Button(
                 title: widget.butTitle,
                 onTap: () {
-                  saveData();
+                  saveDoneId();
                   loadAd();
 
                   Navigator.push(

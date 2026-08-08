@@ -1,11 +1,17 @@
 import "package:flutter/material.dart";
 import "package:flutter_localizations/flutter_localizations.dart";
 
+import "core/data/app_data.dart";
+import "core/helpers/hive_helper.dart";
 import "features/splash/views/splash_view.dart";
 import "generated/l10n.dart";
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await HiveHelper.init();
+  AppData.init();
+
   runApp(const Mogremeto());
 }
 

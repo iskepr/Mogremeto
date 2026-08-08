@@ -1,15 +1,15 @@
 import "dart:convert";
 
-import "package:audioplayers/audioplayers.dart";
-import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_svg/flutter_svg.dart";
 import "package:http/http.dart" as http;
-import "package:shared_preferences/shared_preferences.dart";
 import "package:url_launcher/url_launcher.dart";
 
 import "../../../constants.dart";
+import "../../../core/helpers/audio_helper.dart";
+import "../../../core/helpers/hive_helper.dart";
+import "../../../core/models/case_model.dart";
 import "../../../core/utils/check_update.dart";
 import "../../../core/widgets/button.dart";
 import "../../issues/views/issues_view.dart";
@@ -30,48 +30,62 @@ class _MainMenuViewState extends State<MainMenuView> {
     checkForUpdate(context);
   }
 
-  // ----- تحديث القصص
   Future<void> getStories() async {
-    final List localStories = jsonDecode(
-      await rootBundle.loadString(kRoleplayStoriesPath),
-    );
-    final response = await http.get(Uri.parse(kApi));
-    List stories;
-    if (response.statusCode != 200) {
-      stories = localStories;
-      debugPrint("فشل في تحميل البيانات من السرفر!");
-    } else {
-      stories = json.decode(response.body);
+    try {
+      final String localDataString = await rootBundle.loadString(
+        kRoleplayStoriesPath,
+      );
+      final List<dynamic> localStoriesRaw = jsonDecode(localDataString);
+
+      final List<Map<String, dynamic>> allStoriesMap = localStoriesRaw
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
+
+      try {
+        final response = await http.get(Uri.parse(kApi));
+
+        if (response.statusCode == 200) {
+          final List<dynamic> remoteStories = json.decode(response.body);
+
+          for (var story in remoteStories) {
+            if (story == null || story is! Map) {
+              debugPrint("القصة غير موجودة أو بتنسيق غير صحيح!");
+              continue;
+            }
+
+            final storyId = story["id"];
+            if (storyId == null) {
+              debugPrint("القصة مفقود فيها ID!");
+              continue;
+            }
+
+            final bool alreadyExists = allStoriesMap.any(
+              (s) => s["id"].toString() == storyId.toString(),
+            );
+
+            if (!alreadyExists) {
+              allStoriesMap.add(Map<String, dynamic>.from(story));
+            }
+          }
+        } else {
+          debugPrint(
+            "فشل في تحميل البيانات من السيرفر! الكود: ${response.statusCode}",
+          );
+        }
+      } catch (e) {
+        debugPrint("حدث خطأ أثناء الاتصال بالسيرفر: $e");
+      }
+
+      final List<CaseModel> finalCaseModels = allStoriesMap
+          .map((c) => CaseModel.fromMap(c))
+          .toList();
+
+      await HiveHelper.saveListData<CaseModel>(kBoxCases, finalCaseModels);
+
+      debugPrint("تم حفظ ${finalCaseModels.length} قصة بنجاح في Hive!");
+    } catch (e) {
+      debugPrint("حدث خطأ رئيسي أثناء معالجة القصص: $e");
     }
-
-    final prefs = await SharedPreferences.getInstance();
-
-    for (var story in stories) {
-      if (story == null) {
-        debugPrint("القصة غير موجودة داخل كائن story!");
-        continue;
-      }
-      final storyId = story["id"];
-      if (storyId == null) {
-        debugPrint("القصة مفقود فيها ID أو Story!");
-        continue;
-      }
-
-      final bool alreadyExists = localStories.any((s) => s["id"] == storyId);
-
-      if (!alreadyExists) {
-        localStories.add({
-          "id": storyId,
-          "story": story["story"],
-          "title": story["title"],
-          "type": story["type"],
-          "evidence": story["evidence"],
-          "accused": story["accused"],
-        });
-      }
-    }
-
-    await prefs.setString("localStories", jsonEncode(localStories));
   }
 
   @override
@@ -105,16 +119,8 @@ class _MainMenuViewState extends State<MainMenuView> {
                         children: [
                           Button(
                             title: "قضية جديدة",
-                            onTap: () async {
-                              if (kIsWeb) {
-                                await AudioPlayer().play(
-                                  UrlSource("assets/sounds/click.mp3"),
-                                );
-                              } else {
-                                await AudioPlayer().play(
-                                  AssetSource("sounds/click.mp3"),
-                                );
-                              }
+                            onTap: () {
+                              AudioHelper.runSound("click");
                               if (context.mounted) {
                                 Navigator.push(
                                   context,
@@ -127,21 +133,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                           ),
                           Button(
                             title: "القضايا",
-                            onTap: () async {
-                              if (kIsWeb) {
-                                await AudioPlayer().play(
-                                  UrlSource("assets/sounds/click.mp3"),
-                                );
-                              } else {
-                                await AudioPlayer().play(
-                                  AssetSource("sounds/click.mp3"),
-                                );
-                              }
+                            onTap: () {
+                              AudioHelper.runSound("click");
                               if (context.mounted) {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const Issues(),
+                                    builder: (context) => const IssuesView(),
                                   ),
                                 );
                               }

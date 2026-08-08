@@ -36,4 +36,7 @@ class Victim {
     image: map["image"] ?? "",
     details: map["details"] ?? "",
   );
+
+  @override
+  String toString() => toMap().toString();
 }

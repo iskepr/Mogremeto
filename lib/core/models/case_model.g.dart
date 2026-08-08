@@ -17,7 +17,7 @@ class CaseModelAdapter extends TypeAdapter<CaseModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return CaseModel(
-      id: fields[0] as String,
+      id: fields[0] as int,
       title: fields[1] as String,
       type: fields[2] as String,
       gameMode: fields[3] as GameMode,

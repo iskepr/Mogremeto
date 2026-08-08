@@ -1,61 +1,10 @@
-import "dart:convert";
-
 import "package:flutter/material.dart";
 import "package:flutter_svg/svg.dart";
-import "package:shared_preferences/shared_preferences.dart";
 
-class Issues extends StatefulWidget {
-  const Issues({super.key});
+import "../../../core/data/app_data.dart";
 
-  @override
-  State<Issues> createState() => _IssuesState();
-}
-
-class _IssuesState extends State<Issues> {
-  late List<Map<String, dynamic>> storiesInstance = [];
-  List<String> issues = [];
-  List<int> availableIds = [];
-  List<int> usedIds = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadStories();
-  }
-
-  Future<void> loadStories() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedStories = prefs.getString("localStories");
-
-    if (storedStories != null) {
-      setState(() {
-        storiesInstance = List<Map<String, dynamic>>.from(
-          jsonDecode(storedStories),
-        );
-        issues = storiesInstance
-            .map<String>((story) => story["type"].toString())
-            .toList();
-      });
-      getStoryId();
-    }
-  }
-
-  Future<void> getStoryId() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String>? doneStories = prefs.getStringList("doneStories");
-
-    final List<int> savedIds = doneStories?.map(int.parse).toList() ?? [];
-    setState(() {
-      usedIds = savedIds;
-      availableIds = List.generate(
-        storiesInstance.length,
-        (index) => index,
-      ).where((id) => !savedIds.contains(id)).toList();
-    });
-
-    debugPrint("المحفوظة: $usedIds");
-    debugPrint("المتاحة: $availableIds");
-  }
+class IssuesView extends StatelessWidget {
+  const IssuesView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -75,9 +24,8 @@ class _IssuesState extends State<Issues> {
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
-                children: List.generate(issues.length, (index) {
-                  final String issue = issues[index];
-                  final bool isSaved = usedIds.contains(index);
+                children: AppData.cases.map((issue) {
+                  final bool isSaved = AppData.doneCasesIds.contains(issue.id);
 
                   return Container(
                     decoration: BoxDecoration(
@@ -107,7 +55,7 @@ class _IssuesState extends State<Issues> {
                         ),
                         Center(
                           child: Text(
-                            issue,
+                            issue.type,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: isSaved
@@ -121,7 +69,7 @@ class _IssuesState extends State<Issues> {
                       ],
                     ),
                   );
-                }),
+                }).toList(),
               ),
             ],
           ),

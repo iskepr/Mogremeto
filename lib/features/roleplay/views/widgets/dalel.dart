@@ -1,11 +1,9 @@
 import "dart:async";
-import "dart:convert";
 
-import "package:audioplayers/audioplayers.dart";
-import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
-import "package:shared_preferences/shared_preferences.dart";
 
+import "../../../../core/helpers/audio_helper.dart";
+import "../../../../core/models/data_typs.dart";
 import "../../../../core/widgets/button.dart";
 import "card_view.dart";
 import "vote.dart";
@@ -13,12 +11,12 @@ import "vote.dart";
 class Dalel extends StatefulWidget {
   const Dalel({
     super.key,
-    required this.storyId,
+    required this.caseData,
     required this.inTitle,
     required this.dalelId,
     required this.outUsers,
   });
-  final int storyId;
+  final CaseModel caseData;
   final int dalelId;
   final String inTitle;
   final List outUsers;
@@ -28,21 +26,18 @@ class Dalel extends StatefulWidget {
 }
 
 class _DalelState extends State<Dalel> {
-  List<dynamic>? storiesInstance;
-  late int storyId;
+  late CaseModel caseData;
   late String dalelTitle;
+  late String dalelNum;
   bool isFlip = false;
   bool showCard = true;
   double cardOpacity = 0;
-  String dalelNum = "";
 
   @override
   void initState() {
     super.initState();
-    storyId = widget.storyId;
-    loadStories();
+    caseData = widget.caseData;
 
-    // تعيين dalelNum بناءً على dalelId
     switch (widget.dalelId) {
       case 0:
         dalelNum = "الدليل الأول";
@@ -58,11 +53,8 @@ class _DalelState extends State<Dalel> {
       setState(() {
         cardOpacity = 1;
       });
-      if (kIsWeb) {
-        AudioPlayer().play(UrlSource("assets/sounds/intro.mp3"));
-      } else {
-        AudioPlayer().play(AssetSource("sounds/intro.mp3"));
-      }
+      AudioHelper.runSound("intro");
+
       Timer(const Duration(seconds: 5), () {
         setState(() {
           cardOpacity = 0;
@@ -77,36 +69,11 @@ class _DalelState extends State<Dalel> {
               cardOpacity = 1;
               isFlip = true;
             });
-            if (kIsWeb) {
-              AudioPlayer().play(UrlSource("assets/sounds/flipcard.mp3"));
-            } else {
-              AudioPlayer().play(AssetSource("sounds/flipcard.mp3"));
-            }
           });
+          AudioHelper.runSound("flipcard");
         });
       });
     });
-  }
-
-  Future<void> loadStories() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedStories = prefs.getString("localStories");
-
-    if (storedStories != null) {
-      final List<dynamic> decodedStories = jsonDecode(storedStories);
-      setState(() {
-        storiesInstance = decodedStories;
-
-        // تحديث dalelTitle فقط بعد تحميل البيانات
-        if (storyId >= 0 && storyId < storiesInstance!.length) {
-          dalelTitle =
-              storiesInstance![storyId]["evidence"][widget.dalelId] ??
-              "دليل غير معروف";
-        } else {
-          dalelTitle = "دليل غير معروف";
-        }
-      });
-    }
   }
 
   @override
@@ -163,7 +130,7 @@ class _DalelState extends State<Dalel> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => Vote(
-                                storyId: storyId,
+                                caseData: caseData,
                                 dalelId: widget.dalelId,
                                 outUsers: widget.outUsers,
                               ),

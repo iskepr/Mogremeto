@@ -1,6 +1,7 @@
 import "dart:convert";
 
 import "package:hive/hive.dart";
+
 import "evidence_document.dart";
 import "location_model.dart";
 import "suspect_model.dart";
@@ -16,13 +17,22 @@ enum GameMode {
   @HiveField(1)
   detective("تحقيق");
 
+  static GameMode? fromLable(String? lable) {
+    if (lable == null) return null;
+    try {
+      return GameMode.values.byName(lable);
+    } catch (_) {
+      return null;
+    }
+  }
+
   const GameMode(String name);
 }
 
 @HiveType(typeId: 0)
 class CaseModel extends HiveObject {
   @HiveField(0)
-  final String id;
+  final int id;
 
   @HiveField(1)
   final String title;
@@ -85,7 +95,7 @@ class CaseModel extends HiveObject {
   });
 
   CaseModel copyWith({
-    String? id,
+    int? id,
     String? title,
     String? type,
     GameMode? gameMode,
@@ -125,7 +135,7 @@ class CaseModel extends HiveObject {
       "id": id,
       "title": title,
       "type": type,
-      "game_mode": gameMode,
+      "game_mode": gameMode.name,
       "difficulty": difficulty,
       "victim": victim?.toMap(),
       "location": location?.toMap(),
@@ -141,27 +151,6 @@ class CaseModel extends HiveObject {
   }
 
   factory CaseModel.fromMap(Map<String, dynamic> map) {
-    List<Suspect> parsedSuspects = [];
-    if (map["suspects"] != null) {
-      parsedSuspects = List<Suspect>.from(
-        (map["suspects"] as List<dynamic>).map(
-          (x) => Suspect.fromMap(x as Map<String, dynamic>),
-        ),
-      );
-    } else if (map["accused"] != null) {
-      parsedSuspects = List<Suspect>.from(
-        (map["accused"] as List<dynamic>).map(
-          (x) => Suspect(
-            name: x["type"] ?? "مشتبه به",
-            role: x["type"] ?? "",
-            image: "",
-            description: "",
-            isCulprit: x["criminal"] ?? false,
-          ),
-        ),
-      );
-    }
-
     List<EvidenceDocument> parsedEvidence = [];
     if (map["evidence_documents"] != null) {
       parsedEvidence = List<EvidenceDocument>.from(
@@ -170,23 +159,25 @@ class CaseModel extends HiveObject {
         ),
       );
     } else if (map["evidence"] != null) {
-      parsedEvidence = List<EvidenceDocument>.from(
-        (map["evidence"] as List<dynamic>).map(
-          (x) => EvidenceDocument(
-            title: "دليل",
-            type: "text",
-            image: "",
-            content: x.toString(),
-          ),
-        ),
-      );
+      parsedEvidence = (map["evidence"] as List<dynamic>)
+          .asMap()
+          .entries
+          .map(
+            (entry) => EvidenceDocument(
+              title: "دليل ${entry.key + 1}",
+              type: "text",
+              image: "",
+              content: entry.value.toString(),
+            ),
+          )
+          .toList();
     }
 
     return CaseModel(
-      id: map["id"]?.toString() ?? "",
+      id: map["id"],
       title: map["title"] ?? "",
       type: map["type"] ?? "",
-      gameMode: map["game_mode"] ?? (map["accused"] != null ? 1 : 2),
+      gameMode: GameMode.fromLable(map["game_mode"]) ?? GameMode.roleplay,
       difficulty: map["difficulty"] ?? "متوسط",
       victim: map["victim"] != null ? Victim.fromMap(map["victim"]) : null,
       location: map["location"] != null
@@ -194,7 +185,9 @@ class CaseModel extends HiveObject {
           : null,
       timeOfCrime: map["time_of_crime"] ?? "",
       weapon: map["weapon"] != null ? Weapon.fromMap(map["weapon"]) : null,
-      suspects: parsedSuspects,
+      suspects: List<Suspect>.from(
+        (map["suspects"] as List).map((x) => Suspect.fromMap(x)),
+      ),
       evidenceDocuments: parsedEvidence,
       story: map["story"] ?? "",
       culpritExplanation: map["culprit_explanation"] ?? map["story"] ?? "",
@@ -207,4 +200,7 @@ class CaseModel extends HiveObject {
 
   factory CaseModel.fromJson(String source) =>
       CaseModel.fromMap(json.decode(source));
+
+  @override
+  String toString() => toMap().toString();
 }

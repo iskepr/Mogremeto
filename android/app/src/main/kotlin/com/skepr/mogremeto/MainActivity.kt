@@ -1,4 +1,4 @@
-package com.skepr.mogremeto
+package me.skepr.mogremeto
 
 import io.flutter.embedding.android.FlutterActivity
 

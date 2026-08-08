@@ -1,73 +1,22 @@
-import "dart:convert";
-
-import "package:audioplayers/audioplayers.dart";
-import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
-import "package:shared_preferences/shared_preferences.dart";
 
+import "../../../../core/helpers/audio_helper.dart";
+import "../../../../core/models/data_typs.dart";
 import "../../../../core/widgets/button.dart";
 import "dalel.dart";
 import "done_game.dart";
 
-class Vote extends StatefulWidget {
+class Vote extends StatelessWidget {
   const Vote({
     super.key,
-    required this.storyId,
+    required this.caseData,
     required this.dalelId,
     required this.outUsers,
   });
 
-  final int storyId;
+  final CaseModel caseData;
   final int dalelId;
   final List outUsers;
-
-  @override
-  State<Vote> createState() => _VoteState();
-}
-
-class _VoteState extends State<Vote> {
-  List<dynamic>? storiesInstance;
-  late List<Map<String, dynamic>> accused = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadStories(); // تحميل البيانات بشكل غير متزامن
-  }
-
-  Future<void> loadStories() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedStories = prefs.getString("localStories");
-
-    if (storedStories != null) {
-      final List<dynamic> decodedStories = jsonDecode(storedStories);
-
-      setState(() {
-        storiesInstance = decodedStories;
-
-        // التحقق مما إذا كان storyId صالحًا قبل الوصول إلى البيانات
-        if (widget.storyId >= 0 &&
-            widget.storyId < storiesInstance!.length &&
-            storiesInstance![widget.storyId]["accused"] != null) {
-          accused = List.generate(
-            4,
-            (i) => (i < storiesInstance![widget.storyId]["accused"].length)
-                ? storiesInstance![widget.storyId]["accused"][i]
-                : {"name": "غير معروف", "type": "غير معروف", "criminal": false},
-          );
-        } else {
-          accused = List.generate(
-            4,
-            (i) => {
-              "name": "غير معروف",
-              "type": "غير معروف",
-              "criminal": false,
-            },
-          );
-        }
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,20 +33,18 @@ class _VoteState extends State<Vote> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
-                children: accused
-                    .where(
-                      (player) => !widget.outUsers.contains(player["type"]),
-                    )
+                children: caseData.suspects
+                    .where((player) => !outUsers.contains(player.name))
                     .map(
                       (player) => Button(
-                        title: player["type"],
-                        onTap: () async {
-                          widget.dalelId == 2 && !player["criminal"]
+                        title: player.name,
+                        onTap: () {
+                          dalelId == 2 && !player.isCulprit
                               ? Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => DoneGame(
-                                      storyId: widget.storyId,
+                                      caseData: caseData,
                                       inTitle:
                                           "المُجرميتو كسب\nمعلش تعيشو وتاخدو غيرها",
                                       butTitle: "المُجرميتو فلت",
@@ -108,34 +55,26 @@ class _VoteState extends State<Vote> {
                               : Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => player["criminal"]
+                                    builder: (context) => player.isCulprit
                                         ? DoneGame(
-                                            storyId: widget.storyId,
+                                            caseData: caseData,
                                             inTitle:
                                                 "الف مبروج قبضطم علي المُجرميتو",
                                             butTitle: "تم حل القضية",
                                             soundName: "intro",
                                           )
                                         : Dalel(
-                                            storyId: widget.storyId,
+                                            caseData: caseData,
                                             inTitle: "بَريء",
-                                            dalelId: widget.dalelId + 1,
+                                            dalelId: dalelId + 1,
                                             outUsers: [
-                                              player["type"],
-                                              ...widget.outUsers,
+                                              player.isCulprit,
+                                              ...outUsers,
                                             ],
                                           ),
                                   ),
                                 );
-                          if (kIsWeb) {
-                            await AudioPlayer().play(
-                              UrlSource("assets/sounds/click.mp3"),
-                            );
-                          } else {
-                            await AudioPlayer().play(
-                              AssetSource("sounds/click.mp3"),
-                            );
-                          }
+                          AudioHelper.runSound("click");
                         },
                       ),
                     )

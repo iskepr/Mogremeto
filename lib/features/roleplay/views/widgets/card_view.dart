@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:flutter_svg/svg.dart";
 
-class CardView extends StatefulWidget {
+class CardView extends StatelessWidget {
   const CardView({
     super.key,
     required this.title,
@@ -16,14 +16,9 @@ class CardView extends StatefulWidget {
   final VoidCallback onFlip;
 
   @override
-  State<CardView> createState() => _CardViewState();
-}
-
-class _CardViewState extends State<CardView> {
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onFlip, // <-- استدعاء `onFlip` عند الضغط على الكارت
+      onTap: onFlip,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
         transitionBuilder: (Widget child, Animation<double> animation) {
@@ -48,7 +43,7 @@ class _CardViewState extends State<CardView> {
             child: child,
           );
         },
-        child: widget.flip
+        child: flip
             ? Container(
                 key: const ValueKey(
                   true,
@@ -84,14 +79,14 @@ class _CardViewState extends State<CardView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            widget.title,
+                            title,
                             style: const TextStyle(
                               color: Color(0xFF228272),
                               fontSize: 30,
                             ),
                           ),
                           Text(
-                            widget.subtitle,
+                            subtitle,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Color(0xFF822222),

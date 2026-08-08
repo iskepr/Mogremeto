@@ -4,9 +4,10 @@ import "package:path_provider/path_provider.dart";
 import "../models/data_typs.dart";
 
 const kBoxCases = "cases_box";
+const kBoxDoneCases = "done_cases_box";
 
 class HiveHelper {
-  static const boxes = [kBoxCases];
+  static const boxes = [kBoxCases, kBoxDoneCases];
 
   static Future<void> init() async {
     final dir = await getApplicationSupportDirectory();
@@ -14,6 +15,7 @@ class HiveHelper {
 
     try {
       Hive.registerAdapter(CaseModelAdapter());
+      Hive.registerAdapter(GameModeAdapter());
       Hive.registerAdapter(EvidenceDocumentAdapter());
       Hive.registerAdapter(LocationAdapter());
       Hive.registerAdapter(SuspectAdapter());
