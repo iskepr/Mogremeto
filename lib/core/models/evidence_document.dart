@@ -8,18 +8,18 @@ class EvidenceDocument {
   final String title;
 
   @HiveField(1)
-  final String type;
+  final String? type;
 
   @HiveField(2)
-  final String image;
+  final String? image;
 
   @HiveField(3)
   final String content;
 
   EvidenceDocument({
     required this.title,
-    required this.type,
-    required this.image,
+    this.type,
+    this.image,
     required this.content,
   });
 

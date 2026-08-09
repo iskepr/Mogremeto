@@ -18,8 +18,8 @@ class EvidenceDocumentAdapter extends TypeAdapter<EvidenceDocument> {
     };
     return EvidenceDocument(
       title: fields[0] as String,
-      type: fields[1] as String,
-      image: fields[2] as String,
+      type: fields[1] as String?,
+      image: fields[2] as String?,
       content: fields[3] as String,
     );
   }

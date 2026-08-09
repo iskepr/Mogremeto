@@ -165,8 +165,6 @@ class CaseModel extends HiveObject {
           .map(
             (entry) => EvidenceDocument(
               title: "دليل ${entry.key + 1}",
-              type: "text",
-              image: "",
               content: entry.value.toString(),
             ),
           )

@@ -7,10 +7,10 @@ import "../../../../core/helpers/audio_helper.dart";
 import "../../../../core/helpers/hive_helper.dart";
 import "../../../../core/models/data_typs.dart";
 import "../../../../core/widgets/button.dart";
-import "../../../../main.dart";
+import "../../../main_menu/views/main_menu_view.dart";
 
-class DoneGame extends StatefulWidget {
-  const DoneGame({
+class DoneGameView extends StatefulWidget {
+  const DoneGameView({
     super.key,
     required this.caseData,
     required this.inTitle,
@@ -23,10 +23,10 @@ class DoneGame extends StatefulWidget {
   final String soundName;
 
   @override
-  State<DoneGame> createState() => _DoneGameState();
+  State<DoneGameView> createState() => _DoneGameViewState();
 }
 
-class _DoneGameState extends State<DoneGame> {
+class _DoneGameViewState extends State<DoneGameView> {
   List<dynamic>? storiesInstance;
   bool showStory = false;
   double cardOpacity = 0;
@@ -39,11 +39,11 @@ class _DoneGameState extends State<DoneGame> {
         cardOpacity = 1;
       });
       AudioHelper.runSound(widget.soundName);
-      Timer(const Duration(seconds: 5), () {
+      Timer(const Duration(seconds: 3), () {
         setState(() {
           cardOpacity = 0;
         });
-        Timer(const Duration(seconds: 3), () {
+        Timer(const Duration(seconds: 2), () {
           setState(() {
             showStory = true;
             cardOpacity = 0;
@@ -63,8 +63,6 @@ class _DoneGameState extends State<DoneGame> {
     doneCases.add(widget.caseData.id);
     HiveHelper.saveListData(kBoxDoneCases, doneCases);
   }
-
-  void loadAd() {}
 
   @override
   Widget build(BuildContext context) {
@@ -117,11 +115,11 @@ class _DoneGameState extends State<DoneGame> {
                 title: widget.butTitle,
                 onTap: () {
                   saveDoneId();
-                  loadAd();
-
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const Mogremeto()),
+                    MaterialPageRoute(
+                      builder: (context) => const MainMenuView(),
+                    ),
                   );
                 },
               ),

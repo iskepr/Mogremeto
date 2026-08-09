@@ -4,10 +4,10 @@ import "../../../../core/helpers/audio_helper.dart";
 import "../../../../core/models/data_typs.dart";
 import "../../../../core/widgets/button.dart";
 import "dalel.dart";
-import "done_game.dart";
+import "done_game_view.dart";
 
-class Vote extends StatelessWidget {
-  const Vote({
+class VoteView extends StatelessWidget {
+  const VoteView({
     super.key,
     required this.caseData,
     required this.dalelId,
@@ -43,7 +43,7 @@ class Vote extends StatelessWidget {
                               ? Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => DoneGame(
+                                    builder: (context) => DoneGameView(
                                       caseData: caseData,
                                       inTitle:
                                           "المُجرميتو كسب\nمعلش تعيشو وتاخدو غيرها",
@@ -56,7 +56,7 @@ class Vote extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => player.isCulprit
-                                        ? DoneGame(
+                                        ? DoneGameView(
                                             caseData: caseData,
                                             inTitle:
                                                 "الف مبروج قبضطم علي المُجرميتو",
@@ -68,7 +68,7 @@ class Vote extends StatelessWidget {
                                             inTitle: "بَريء",
                                             dalelId: dalelId + 1,
                                             outUsers: [
-                                              player.isCulprit,
+                                              player.name,
                                               ...outUsers,
                                             ],
                                           ),

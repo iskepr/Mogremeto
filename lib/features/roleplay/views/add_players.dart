@@ -35,9 +35,12 @@ class _AddPlayersState extends State<AddPlayers> {
   void initState() {
     super.initState();
 
-    caseId = AppData.availableCasesIds.elementAt(
-      Random().nextInt(AppData.availableCasesIds.length),
-    );
+    final availableIds = AppData.availableCasesIds;
+    if (availableIds.isNotEmpty) {
+      caseId = availableIds[Random().nextInt(availableIds.length)];
+    } else {
+      caseId = -1;
+    }
   }
 
   @override

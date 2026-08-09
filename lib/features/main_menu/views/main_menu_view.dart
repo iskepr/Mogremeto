@@ -12,7 +12,7 @@ import "../../../core/helpers/hive_helper.dart";
 import "../../../core/models/case_model.dart";
 import "../../../core/utils/check_update.dart";
 import "../../../core/widgets/button.dart";
-import "../../issues/views/issues_view.dart";
+import "../../cases/views/cases_view.dart";
 import "../../roleplay/views/add_players.dart";
 
 class MainMenuView extends StatefulWidget {

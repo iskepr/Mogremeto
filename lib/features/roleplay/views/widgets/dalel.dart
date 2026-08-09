@@ -6,7 +6,7 @@ import "../../../../core/helpers/audio_helper.dart";
 import "../../../../core/models/data_typs.dart";
 import "../../../../core/widgets/button.dart";
 import "card_view.dart";
-import "vote.dart";
+import "vote_view.dart";
 
 class Dalel extends StatefulWidget {
   const Dalel({
@@ -27,7 +27,6 @@ class Dalel extends StatefulWidget {
 
 class _DalelState extends State<Dalel> {
   late CaseModel caseData;
-  late String dalelTitle;
   late String dalelNum;
   bool isFlip = false;
   bool showCard = true;
@@ -111,9 +110,9 @@ class _DalelState extends State<Dalel> {
                     duration: const Duration(seconds: 1),
                     child: CardView(
                       title: dalelNum,
-                      subtitle: dalelTitle,
+                      subtitle:
+                          caseData.evidenceDocuments[widget.dalelId].content,
                       flip: isFlip,
-                      onFlip: () {},
                     ),
                   ),
             Padding(
@@ -129,7 +128,7 @@ class _DalelState extends State<Dalel> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Vote(
+                              builder: (context) => VoteView(
                                 caseData: caseData,
                                 dalelId: widget.dalelId,
                                 outUsers: widget.outUsers,
