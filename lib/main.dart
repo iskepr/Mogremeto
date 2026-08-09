@@ -10,7 +10,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await HiveHelper.init();
-  AppData.init();
+  await AppData.init();
 
   runApp(const Mogremeto());
 }

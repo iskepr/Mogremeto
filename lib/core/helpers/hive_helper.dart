@@ -1,3 +1,4 @@
+import "package:flutter/foundation.dart";
 import "package:hive_flutter/hive_flutter.dart";
 import "package:path_provider/path_provider.dart";
 
@@ -10,8 +11,12 @@ class HiveHelper {
   static const boxes = [kBoxCases, kBoxDoneCases];
 
   static Future<void> init() async {
-    final dir = await getApplicationSupportDirectory();
-    await Hive.initFlutter(dir.path);
+    String? path;
+    if (!kIsWeb) {
+      final dir = await getApplicationSupportDirectory();
+      path = dir.path;
+    }
+    await Hive.initFlutter(path);
 
     try {
       Hive.registerAdapter(CaseModelAdapter());
